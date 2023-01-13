@@ -1,8 +1,7 @@
-var chaiSubset = require("chai-subset");
+import { Transaction } from "@zilliqa-js/account";
 import chai from "chai";
+import chaiSubset from "chai-subset";
 chai.use(chaiSubset);
-
-import {Transaction} from "@zilliqa-js/account";
 
 export interface EventParam {
   type?: string;
@@ -14,26 +13,37 @@ declare global {
   export namespace Chai {
     interface Assertion {
       eventLog(eventName: string): Promise<void>;
-      eventLogWithParams(eventName: string, ...params: EventParam[]): Promise<void>;
+      eventLogWithParams(
+        eventName: string,
+        ...params: EventParam[]
+      ): Promise<void>;
     }
   }
 }
 
-export const scillaChaiEventMatcher = function (chai: Chai.ChaiStatic, utils: Chai.ChaiUtils) {
-  var Assertion = chai.Assertion;
+export const scillaChaiEventMatcher = function (
+  chai: Chai.ChaiStatic,
+  utils: Chai.ChaiUtils
+) {
+  const Assertion = chai.Assertion;
   Assertion.addMethod("eventLog", function (eventName: string) {
-    var tx: Transaction = this._obj;
+    const tx: Transaction = this._obj;
 
     const receipt = tx.getReceipt()!;
     new Assertion(receipt.event_logs).not.to.be.null;
 
     const event_logs = receipt.event_logs!;
 
-    new Assertion(event_logs.map(({_eventname}) => _eventname)).to.contain(eventName);
+    new Assertion(event_logs.map(({ _eventname }) => _eventname)).to.contain(
+      eventName
+    );
   });
 
-  Assertion.addMethod("eventLogWithParams", function (eventName: string, ...params: EventParam[]) {
-    var tx: Transaction = this._obj;
+  Assertion.addMethod("eventLogWithParams", function (
+    eventName: string,
+    ...params: EventParam[]
+  ) {
+    const tx: Transaction = this._obj;
 
     const receipt = tx.getReceipt()!;
     new Assertion(this._obj).to.eventLog(eventName);

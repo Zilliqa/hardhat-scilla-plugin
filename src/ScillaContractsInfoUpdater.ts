@@ -1,12 +1,13 @@
-import {glob} from "glob";
-import fs from "fs";
-import path, {dirname} from "path";
-import {createHash} from "crypto";
-import {ContractName, parseScilla, ParsedContract} from "./ScillaParser";
 import clc from "cli-color";
+import { createHash } from "crypto";
+import fs from "fs";
+import { glob } from "glob";
+import path, { dirname } from "path";
+
+import { ContractName, ParsedContract, parseScilla } from "./ScillaParser";
 
 // For some reason, hardhat deletes json files in artifacts, so it couldn't be scilla.json
-const CONTRACTS_INFO_CACHE_FILE = path.join(__dirname, "../artifacts/scilla.cache");
+const CONTRACTS_INFO_CACHE_FILE = "artifacts/scilla.cache";
 
 export interface ContractInfo {
   hash: string;
@@ -15,14 +16,16 @@ export interface ContractInfo {
 }
 
 type ContractPath = string;
-export type ContractMapByName = {[key: ContractName]: ContractInfo};
-type ContractMapByPath = {[key: ContractPath]: ContractInfo};
+export type ContractMapByName = Record<ContractName, ContractInfo>;
+type ContractMapByPath = Record<ContractPath, ContractInfo>;
 
 export const updateContractsInfo = () => {
   let contractsInfo: ContractMapByName = {};
-  let files = glob.sync("contracts/**/*.scilla");
+  const files = glob.sync("contracts/**/*.scilla");
   if (files.length === 0) {
-    console.log(clc.yellowBright("No scilla contracts were found in contracts directory."));
+    console.log(
+      clc.yellowBright("No scilla contracts were found in contracts directory.")
+    );
     return;
   }
 
@@ -30,7 +33,10 @@ export const updateContractsInfo = () => {
 
   let somethingChanged = false;
   files.forEach((file) => {
-    if (file in contractsInfo && contractsInfo[file].hash === getFileHash(file)) {
+    if (
+      file in contractsInfo &&
+      contractsInfo[file].hash === getFileHash(file)
+    ) {
       return; // Nothing to do
     }
 
@@ -53,15 +59,19 @@ export const updateContractsInfo = () => {
   }
 };
 
-export const loadScillaContractsInfo = (): ContractMapByName =>  {
+export const loadScillaContractsInfo = (): ContractMapByName => {
   const contractsInfo = loadContractsInfo();
   return convertToMapByName(contractsInfo);
-}
+};
 
-const convertToMapByName = (contracts: ContractMapByPath): ContractMapByName => {
-  let contractsByName: ContractMapByName = {};
-  for (let key in contracts) {
-    contractsByName[contracts[key].parsedContract.name] = contracts[key];
+const convertToMapByName = (
+  contracts: ContractMapByPath
+): ContractMapByName => {
+  const contractsByName: ContractMapByName = {};
+  for (const key in contracts) {
+    const elem = contracts[key];
+    const contractName: ContractName = elem.parsedContract.name;
+    contractsByName[contractName] = elem;
   }
 
   return contractsByName;
@@ -73,28 +83,28 @@ const loadContractsInfo = (): ContractMapByPath => {
     return {};
   }
 
-  let contents = fs.readFileSync(CONTRACTS_INFO_CACHE_FILE, "utf8");
+  const contents = fs.readFileSync(CONTRACTS_INFO_CACHE_FILE, "utf8");
   return JSON.parse(contents);
 };
 
 const saveContractsInfo = (contracts: ContractMapByPath) => {
-  fs.mkdirSync(dirname(CONTRACTS_INFO_CACHE_FILE), {recursive: true});
+  fs.mkdirSync(dirname(CONTRACTS_INFO_CACHE_FILE), { recursive: true });
   fs.writeFileSync(CONTRACTS_INFO_CACHE_FILE, JSON.stringify(contracts));
 };
 
 const getFileHash = (fileName: string): string => {
-  let contents = fs.readFileSync(fileName, "utf8");
+  const contents = fs.readFileSync(fileName, "utf8");
   const hashSum = createHash("md5");
   hashSum.update(contents);
   return hashSum.digest("hex");
 };
 
 const parseScillaFile = (fileName: string): ContractInfo | null => {
-  let contents = fs.readFileSync(fileName, "utf8");
+  const contents = fs.readFileSync(fileName, "utf8");
   const hashSum = createHash("md5");
   hashSum.update(contents);
 
   const parsedContract = parseScilla(fileName);
 
-  return {hash: hashSum.digest("hex"), path: fileName, parsedContract};
+  return { hash: hashSum.digest("hex"), path: fileName, parsedContract };
 };

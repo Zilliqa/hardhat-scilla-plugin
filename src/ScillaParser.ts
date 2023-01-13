@@ -1,6 +1,6 @@
 const parse: any = require("s-expression");
+import { execSync } from "child_process";
 import fs from "fs";
-import {execSync} from "child_process";
 
 type ScillaDataType = string;
 
@@ -66,7 +66,12 @@ export const parseScilla = (filename: string): ParsedContract => {
   const ccomps = contr.filter((row: string[]) => row[0] === "ccomps")[0][1];
   const transitions = extractTransitions(ccomps);
 
-  return {name: contractName, transitions, fields, constructorParams: contractParams};
+  return {
+    name: contractName,
+    transitions,
+    fields,
+    constructorParams: contractParams,
+  };
 };
 
 const extractContractName = (contrElem: any[]): ContractName => {
@@ -88,43 +93,45 @@ const extractContractParams = (contrElem: any[]): Fields | null => {
 };
 
 const extractContractFields = (cfieldsElem: any[]): Fields => {
-  return cfieldsElem.map((row: any[]): Field => {
-    const identData = row[0];
-    if (identData[0] !== "Ident") {
-      throw new Error(`Index 0 is not Ident: ${identData}`);
-    }
+  return cfieldsElem.map(
+    (row: any[]): Field => {
+      const identData = row[0];
+      if (identData[0] !== "Ident") {
+        throw new Error(`Index 0 is not Ident: ${identData}`);
+      }
 
-    const fieldNameData = identData[1];
-    if (fieldNameData[0] !== "SimpleLocal") {
-      throw new Error(`Index 0 is not SimpleLocal: ${fieldNameData}`);
-    }
+      const fieldNameData = identData[1];
+      if (fieldNameData[0] !== "SimpleLocal") {
+        throw new Error(`Index 0 is not SimpleLocal: ${fieldNameData}`);
+      }
 
-    const fieldTypeData = row[1];
-    // Currently we just parse PrimType, for the rest we don't parse it completely.
-    if (fieldTypeData[0] === "PrimType") {
-      return {
-        type: fieldTypeData[1],
-        name: fieldNameData[1]
-      };
-    } else if (fieldTypeData[0] === "ADT") {
-      return {
-        type: "ADT",
-        name: fieldNameData[1]
-      };
-    } else if (fieldTypeData[0] === "MapType") {
-      return {
-        type: "Map",
-        name: fieldNameData[1]
-      };
-    } else if (fieldTypeData[0] === "Address") {
-      return {
-        type: "Address",
-        name: fieldNameData[1]
-      };
-    } else {
-      throw new Error(`Data type is unknown: ${fieldTypeData}`);
+      const fieldTypeData = row[1];
+      // Currently we just parse PrimType, for the rest we don't parse it completely.
+      if (fieldTypeData[0] === "PrimType") {
+        return {
+          type: fieldTypeData[1],
+          name: fieldNameData[1],
+        };
+      } else if (fieldTypeData[0] === "ADT") {
+        return {
+          type: "ADT",
+          name: fieldNameData[1],
+        };
+      } else if (fieldTypeData[0] === "MapType") {
+        return {
+          type: "Map",
+          name: fieldNameData[1],
+        };
+      } else if (fieldTypeData[0] === "Address") {
+        return {
+          type: "Address",
+          name: fieldNameData[1],
+        };
+      } else {
+        throw new Error(`Data type is unknown: ${fieldTypeData}`);
+      }
     }
-  });
+  );
 };
 
 const extractTransitions = (ccompsElem: any[]): Transitions => {
@@ -156,13 +163,13 @@ const extractTransitions = (ccompsElem: any[]): Transitions => {
       const primName = row[0][1][1];
       return {
         type: primType,
-        name: primName
+        name: primName,
       };
     });
     return {
       type: compType,
       name: compName[1],
-      params: compParams
+      params: compParams,
     };
   });
 };
