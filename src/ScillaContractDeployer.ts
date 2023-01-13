@@ -2,8 +2,8 @@ import { Contract, Init, Value } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import fs from "fs";
-import hre from "hardhat";
 import { HardhatPluginError } from "hardhat/plugins";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
 import { Fields, isNumeric, TransitionParam } from "./ScillaParser";
@@ -19,7 +19,7 @@ interface Setup {
 
 export let setup: Setup | null = null;
 
-const initZilliqa = (
+export const initZilliqa = (
   zilliqaNetworkUrl: string,
   chainId: number,
   privateKeys: string[]
@@ -48,7 +48,7 @@ export class ScillaContract extends Contract {
   [key: string]: ContractFunction | any;
 }
 
-export async function deploy(contractName: string, ...args: any[]) {
+export async function deploy(hre: HardhatRuntimeEnvironment, contractName: string, ...args: any[]) {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
   if (contractInfo === undefined) {
     throw new Error(`Scilla contract ${contractName} doesn't exist.`);
