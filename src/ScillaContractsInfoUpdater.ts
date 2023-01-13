@@ -16,7 +16,8 @@ export interface ContractInfo {
 }
 
 type ContractPath = string;
-export type ContractMapByName = Record<ContractName, ContractInfo>;
+type ContractMapByName = Record<ContractName, ContractInfo>;
+export type ScillaContracts = ContractMapByName;
 type ContractMapByPath = Record<ContractPath, ContractInfo>;
 
 export const updateContractsInfo = () => {
