@@ -2,7 +2,7 @@ import {glob} from "glob";
 import fs from "fs";
 import path, {dirname} from "path";
 import {createHash} from "crypto";
-import {ContractName, Transitions, parseScilla, Fields, ParsedContract} from "./ScillaParser";
+import {ContractName, parseScilla, ParsedContract} from "./ScillaParser";
 import clc from "cli-color";
 
 // For some reason, hardhat deletes json files in artifacts, so it couldn't be scilla.json
