@@ -63,10 +63,15 @@ Scilla testing can be done in the same way ethers.js is used for solidity. It's 
 To deploy a contract all you need to know is its name:
 
 ```typescript
-import {deploy, ScillaContract} from "../../helper/ScillaHelper";
+import {ScillaContract, initZilliqa} from "hardhat-scilla-plugin";
 
-let contract: ScillaContract = await deploy("SetGet");
-let contract: ScillaContract = await deploy("HelloWorld", "Hello World"); // Contract with initial parameters.
+const privateKey = "254d9924fc1dcdca44ce92d80255c6a0bb690f867abde80e626fbfef4d357004";
+initZilliqa(hre.getNetworkUrl(), hre.getZilliqaChainId(), [
+  privateKey
+]);
+
+let contract: ScillaContract = await hre.deploy("SetGet");
+let contract: ScillaContract = await hre.deploy("HelloWorld", "Hello World"); // Contract with initial parameters.
 ```
 
 ### Call a transition
