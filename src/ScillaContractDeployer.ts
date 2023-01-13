@@ -1,11 +1,12 @@
-import {Zilliqa} from "@zilliqa-js/zilliqa";
+import { Contract, Init, Value } from "@zilliqa-js/contract";
+import { BN, bytes, Long, units } from "@zilliqa-js/util";
+import { Zilliqa } from "@zilliqa-js/zilliqa";
 import fs from "fs";
-import {BN, Long, units, bytes} from "@zilliqa-js/util";
-import {Init, Contract, Value} from "@zilliqa-js/contract";
-import {ContractInfo} from "./ScillaContractsInfoUpdater";
-import {TransitionParam, isNumeric, Fields} from "./ScillaParser";
 import hre from "hardhat";
 import { HardhatPluginError } from "hardhat/plugins";
+
+import { ContractInfo } from "./ScillaContractsInfoUpdater";
+import { Fields, isNumeric, TransitionParam } from "./ScillaParser";
 
 interface Setup {
   zilliqa: Zilliqa;
@@ -18,25 +19,29 @@ interface Setup {
 
 export let setup: Setup | null = null;
 
-const initZilliqa = (zilliqaNetworkUrl: string, chainId: number, privateKeys: string[]) => {
+const initZilliqa = (
+  zilliqaNetworkUrl: string,
+  chainId: number,
+  privateKeys: string[]
+) => {
   setup = {
     zilliqa: new Zilliqa(zilliqaNetworkUrl),
     version: bytes.pack(chainId, 1),
     gasPrice: units.toQa("2000", units.Units.Li),
     gasLimit: Long.fromNumber(50000),
     attempts: 10,
-    timeout: 1000
+    timeout: 1000,
   };
 
-  privateKeys.forEach(pk => setup!.zilliqa.wallet.addByPrivateKey(pk));
+  privateKeys.forEach((pk) => setup!.zilliqa.wallet.addByPrivateKey(pk));
 };
 
 function read(f: string) {
-  let t = fs.readFileSync(f, "utf8");
+  const t = fs.readFileSync(f, "utf8");
   return t;
 }
 
-export type ContractFunction<T = any> = (...args: Array<any>) => Promise<T>;
+export type ContractFunction<T = any> = (...args: any[]) => Promise<T>;
 
 export class ScillaContract extends Contract {
   // Transitions and fields
@@ -44,13 +49,17 @@ export class ScillaContract extends Contract {
 }
 
 export async function deploy(contractName: string, ...args: any[]) {
-  let contractInfo: ContractInfo = hre.scillaContracts[contractName];
+  const contractInfo: ContractInfo = hre.scillaContracts[contractName];
   if (contractInfo === undefined) {
     throw new Error(`Scilla contract ${contractName} doesn't exist.`);
   }
 
   let sc: ScillaContract;
-  let init: Init = fillInit(contractName, contractInfo.parsedContract.constructorParams, ...args);
+  const init: Init = fillInit(
+    contractName,
+    contractInfo.parsedContract.constructorParams,
+    ...args
+  );
 
   sc = await deploy_from_file(contractInfo.path, init);
   contractInfo.parsedContract.transitions.forEach((transition) => {
@@ -66,7 +75,7 @@ export async function deploy(contractName: string, ...args: any[]) {
         values.push({
           vname: param.name,
           type: param.type,
-          value: args[index].toString()
+          value: args[index].toString(),
         });
       });
 
@@ -76,7 +85,7 @@ export async function deploy(contractName: string, ...args: any[]) {
     contractInfo.parsedContract.fields.forEach((field) => {
       sc[field.name] = async () => {
         const state = await sc.getState();
-        if (isNumeric(field.type)) return Number(state[field.name]);
+        if (isNumeric(field.type)) { return Number(state[field.name]); }
         return state[field.name];
       };
     });
@@ -85,8 +94,12 @@ export async function deploy(contractName: string, ...args: any[]) {
   return sc;
 }
 
-const fillInit = (contractName: string, contractParams: Fields | null, ...userSpecifiedArgs: any[]): Init => {
-  let init: Init = [{vname: "_scilla_version", type: "Uint32", value: "0"}];
+const fillInit = (
+  contractName: string,
+  contractParams: Fields | null,
+  ...userSpecifiedArgs: any[]
+): Init => {
+  const init: Init = [{ vname: "_scilla_version", type: "Uint32", value: "0" }];
 
   if (contractParams) {
     if (userSpecifiedArgs.length !== contractParams.length) {
@@ -98,7 +111,7 @@ const fillInit = (contractName: string, contractParams: Fields | null, ...userSp
       init.push({
         vname: param.name,
         type: param.type,
-        value: userSpecifiedArgs[index].toString()
+        value: userSpecifiedArgs[index].toString(),
       });
     });
   } else {
@@ -113,14 +126,25 @@ const fillInit = (contractName: string, contractParams: Fields | null, ...userSp
 };
 
 // deploy a smart contract whose code is in a file with given init arguments
-async function deploy_from_file(path: string, init: Init): Promise<ScillaContract> {
-  if (setup === null ) {
-    throw new HardhatPluginError("hardhat-scilla-plugin", "Please call initZilliqa function.");
+async function deploy_from_file(
+  path: string,
+  init: Init
+): Promise<ScillaContract> {
+  if (setup === null) {
+    throw new HardhatPluginError(
+      "hardhat-scilla-plugin",
+      "Please call initZilliqa function."
+    );
   }
 
   const code = read(path);
   const contract = setup.zilliqa.contracts.new(code, init);
-  let [_, sc] = await contract.deploy({...setup}, setup.attempts, setup.timeout, false);
+  const [_, sc] = await contract.deploy(
+    { ...setup },
+    setup.attempts,
+    setup.timeout,
+    false
+  );
 
   return sc;
 }
@@ -133,8 +157,11 @@ export async function sc_call(
   amt = new BN(0)
   // caller_pub_key = setup.pub_keys[0]
 ) {
-  if (setup === null ) {
-    throw new HardhatPluginError("hardhat-scilla-plugin", "Please call initZilliqa function.");
+  if (setup === null) {
+    throw new HardhatPluginError(
+      "hardhat-scilla-plugin",
+      "Please call initZilliqa function."
+    );
   }
 
   return sc.call(
@@ -144,7 +171,7 @@ export async function sc_call(
       version: setup.version,
       amount: amt,
       gasPrice: setup.gasPrice,
-      gasLimit: setup.gasLimit
+      gasLimit: setup.gasLimit,
       // pubKey: caller_pub_key
     },
     setup.attempts,

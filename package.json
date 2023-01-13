@@ -1,6 +1,6 @@
 {
-  "name": "hardhat-ts-plugin-boilerplate",
-  "version": "0.1.1",
+  "name": "hardhat-scilla-plugin",
+  "version": "1.0.0",
   "description": "Hardhat TypeScript plugin for scilla testing",
   "repository": "github:its-saeed/scilla-hardhat-plugin",
   "author": "Saeed Dadkhah",

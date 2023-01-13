@@ -12,22 +12,20 @@ This plugin is used to test scilla contracts in hardhat. It tries to be like eth
 
 ## Installation
 
-<_A step-by-step guide on how to install the plugin_>
-
 ```bash
-npm install <your npm package name> [list of peer dependencies]
+npm install hardhat-scilla-plugin
 ```
 
 Import the plugin in your `hardhat.config.js`:
 
 ```js
-require("<your plugin npm package name>");
+require("hardhat-scilla-plugin");
 ```
 
 Or if you are using TypeScript, in your `hardhat.config.ts`:
 
 ```ts
-import "<your plugin npm package name>";
+import "hardhat-scilla-plugin";
 ```
 
 ## Tasks
