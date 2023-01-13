@@ -4,7 +4,7 @@
 import "hardhat/types/config";
 import "hardhat/types/runtime";
 
-import { ContractMapByName } from "./ScillaContractsInfoUpdater"
+import { ContractMapByName } from "./ScillaContractsInfoUpdater";
 
 declare module "hardhat/types/config" {
   // This is an example of an extension to one of the Hardhat config values.

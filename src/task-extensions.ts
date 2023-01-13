@@ -1,9 +1,9 @@
-import { task } from "hardhat/config";
-import {execSync} from "child_process";
-import {glob} from "glob";
+import { execSync } from "child_process";
 import clc from "cli-color";
+import { glob } from "glob";
+import { task } from "hardhat/config";
 
-import {updateContractsInfo as updateScillaContractsInfo} from "./ScillaContractsInfoUpdater";
+import { updateContractsInfo as updateScillaContractsInfo } from "./ScillaContractsInfoUpdater";
 
 task(
   "scilla-check",
