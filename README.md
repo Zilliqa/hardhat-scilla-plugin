@@ -53,8 +53,6 @@ For global options help run: hardhat help
 
 ## Environment extensions
 
-<_A description of each extension to the Hardhat Runtime Environment_>
-
 This plugin extends the Hardhat Runtime Environment by adding an `scillaContracts` field
 whose type is `ScillaContracts`.
 
@@ -135,7 +133,7 @@ But if you just want to expect on the value of a event parameter do this:
 expect(tx).to.have.eventLogWithParams("getHello()", {value: "hello world"});
 ```
 
-for more tests please take look at [scilla tests](./test/scilla/).
+for more tests please take look at [scilla tests](https://github.com/Zilliqa/Zilliqa/tree/master/tests/EvmAcceptanceTests/test/scilla).
 ### TODO
 
 - Support formatting complex data types such as `Map` and `List`
