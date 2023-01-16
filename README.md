@@ -107,6 +107,11 @@ There are two custom chai matchers specially developed to `expect` scilla events
 Use `eventLog` if you just need to expect event name:
 
 ```typescript
+import chai from "chai";
+import {scillaChaiEventMatcher} from "hardhat-scilla-plugin";
+
+chai.use(scillaChaiEventMatcher);
+
 it("Should contain event data if emit function is called", async function () {
   const tx = await contract.emit();
   expect(tx).to.have.eventLog("Emit");
@@ -116,6 +121,11 @@ it("Should contain event data if emit function is called", async function () {
 Otherwise, if you need to deeply expect an event, you should use `eventLogWithParams`. The first parameter is again the event name. The rest are parameters of the expected event. If you expect to have an event like `getHello` sending a parameter named `msg` with a `"hello world"` value:
 
 ```typescript
+import chai from "chai";
+import {scillaChaiEventMatcher} from "hardhat-scilla-plugin";
+
+chai.use(scillaChaiEventMatcher);
+
 it("Should send getHello() event when getHello() transition is called", async function () {
   const tx = await contract.getHello();
   expect(tx).to.have.eventLogWithParams("getHello()", {value: "hello world", vname: "msg"});

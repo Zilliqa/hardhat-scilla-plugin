@@ -10,6 +10,8 @@ import "./type-extensions";
 
 export {ScillaContract, initZilliqa} from "./ScillaContractDeployer";
 
+export {scillaChaiEventMatcher} from "./ScillaChaiMatchers";
+
 
 extendEnvironment((hre) => {
   // We add a field to the Hardhat Runtime Environment here.
