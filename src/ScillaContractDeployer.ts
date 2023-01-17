@@ -8,7 +8,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
 import { Fields, isNumeric, TransitionParam } from "./ScillaParser";
 
-interface Setup {
+export interface Setup {
   zilliqa: Zilliqa;
   readonly attempts: number;
   readonly timeout: number;
@@ -23,7 +23,7 @@ export const initZilliqa = (
   zilliqaNetworkUrl: string,
   chainId: number,
   privateKeys: string[]
-) => {
+): Setup => {
   setup = {
     zilliqa: new Zilliqa(zilliqaNetworkUrl),
     version: bytes.pack(chainId, 1),
@@ -34,6 +34,7 @@ export const initZilliqa = (
   };
 
   privateKeys.forEach((pk) => setup!.zilliqa.wallet.addByPrivateKey(pk));
+  return setup;
 };
 
 function read(f: string) {
@@ -48,7 +49,11 @@ export class ScillaContract extends Contract {
   [key: string]: ContractFunction | any;
 }
 
-export async function deploy(hre: HardhatRuntimeEnvironment, contractName: string, ...args: any[]) {
+export async function deploy(
+  hre: HardhatRuntimeEnvironment,
+  contractName: string,
+  ...args: any[]
+) {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
   if (contractInfo === undefined) {
     throw new Error(`Scilla contract ${contractName} doesn't exist.`);
@@ -85,7 +90,9 @@ export async function deploy(hre: HardhatRuntimeEnvironment, contractName: strin
     contractInfo.parsedContract.fields.forEach((field) => {
       sc[field.name] = async () => {
         const state = await sc.getState();
-        if (isNumeric(field.type)) { return Number(state[field.name]); }
+        if (isNumeric(field.type)) {
+          return Number(state[field.name]);
+        }
         return state[field.name];
       };
     });

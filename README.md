@@ -65,10 +65,10 @@ To deploy a contract all you need to know is its name:
 ```typescript
 import {ScillaContract, initZilliqa} from "hardhat-scilla-plugin";
 
-const privateKey = "254d9924fc1dcdca44ce92d80255c6a0bb690f867abde80e626fbfef4d357004";
-initZilliqa(hre.getNetworkUrl(), hre.getZilliqaChainId(), [
-  privateKey
-]);
+const privateKeys = ["254d9924fc1dcdca44ce92d80255c6a0bb690f867abde80e626fbfef4d357004"];
+const network_url = "http://localhost:5555";
+const chain_id = 1;
+initZilliqa(network_url, chain_id, privateKeys);
 
 let contract: ScillaContract = await hre.deploy("SetGet");
 let contract: ScillaContract = await hre.deploy("HelloWorld", "Hello World"); // Contract with initial parameters.
