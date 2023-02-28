@@ -69,7 +69,13 @@ export async function deploy(
   sc = await deploy_from_file(contractInfo.path, init);
   contractInfo.parsedContract.transitions.forEach((transition) => {
     sc[transition.name] = async (...args: any[]) => {
-      if (args.length !== transition.params.length) {
+      let amount = 0;
+      if (args.length === transition.params.length + 1) {
+        // The last param is Tx info such as amount
+        const txParams = args.pop();
+        amount = txParams.amount ?? 0;
+      }
+      else if (args.length !== transition.params.length) {
         throw new Error(
           `Expected to receive ${transition.params.length} parameters for ${transition.name} but got ${args.length}`
         );
@@ -84,7 +90,7 @@ export async function deploy(
         });
       });
 
-      return sc_call(sc, transition.name, values);
+      return sc_call(sc, transition.name, values, new BN(amount));
     };
 
     contractInfo.parsedContract.fields.forEach((field) => {
