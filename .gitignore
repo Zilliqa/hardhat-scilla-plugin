@@ -61,3 +61,8 @@ typings/
 
 # environment variables
 .env
+
+# Emacs backups
+*~
+\#*
+.\#*
