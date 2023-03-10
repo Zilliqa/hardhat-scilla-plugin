@@ -31,7 +31,7 @@ describe("", function () {
 
     it("Should have correct transitions parameters for setHello", function () {
       expect(contract.transitions[0].params).to.deep.eq([
-        { type: "String", name: "msg" },
+        { type: "String", name: "msg" , typeobject: "String"},
       ]);
     });
 

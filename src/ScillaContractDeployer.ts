@@ -1,4 +1,4 @@
-import { Contract, Init, Value } from "@zilliqa-js/contract";
+import { Contract, Init } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import fs from "fs";
@@ -6,7 +6,18 @@ import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
-import { Fields, isNumeric, TransitionParam } from "./ScillaParser";
+import { Field, Fields, isNumeric, TransitionParam } from "./ScillaParser";
+
+interface Value{
+  vname: string;
+  type: string;
+  value: string;
+}
+interface ADTValue {
+  constructor: string;
+  argtypes: string[];
+  arguments: (string | ADTValue)[];
+}
 
 export interface Setup {
   zilliqa: Zilliqa;
@@ -49,6 +60,52 @@ export class ScillaContract extends Contract {
   [key: string]: ContractFunction | any;
 }
 
+function handleParam(param:Field, arg:any, init_call:boolean = true):Value{
+  if (typeof param.typeobject == 'undefined'){
+    throw new HardhatPluginError("hardhat-scilla-plugin", "Parameters were incorrectly parsed. Try clearing your scilla.cache file.")
+  } else {
+    if (typeof param.typeobject == 'string'){
+      if (init_call){
+        return {
+          vname: param.name,
+          type: param.type,
+          value: arg.toString(),
+        };
+      } else {
+        return arg.toString();
+      }
+    }
+    else{
+      const values : Value[] = [];
+      param.typeobject.argtypes.forEach((param:Field, index:number) => {
+        values.push(handleParam(param, arg[index],false))
+      });
+      const argtypes2 = param.typeobject.argtypes.map((x)=>x.type);
+      if (init_call==true){
+        const value = JSON.parse(JSON.stringify({
+          constructor: param.typeobject.ctor,
+          argtypes: argtypes2,
+          arguments: values
+        }));
+        return {
+          vname: param.name,
+          type: param.type,
+          value: value
+        }
+      } else {
+        return JSON.parse(JSON.stringify({
+          vname: param.name,
+          type: param.type,
+          constructor: param.typeobject.ctor,
+          argtypes: argtypes2,
+          arguments: values
+        }));
+      }
+    }
+  }
+}
+
+
 export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
@@ -83,11 +140,7 @@ export async function deploy(
 
       const values: Value[] = [];
       transition.params.forEach((param: TransitionParam, index: number) => {
-        values.push({
-          vname: param.name,
-          type: param.type,
-          value: args[index].toString(),
-        });
+        values.push(handleParam(param, args[index]));
       });
 
       return sc_call(sc, transition.name, values, new BN(amount));
@@ -120,10 +173,10 @@ const fillInit = (
         `Expected to receive ${contractParams.length} parameters for ${contractName} deployment but got ${userSpecifiedArgs.length}`
       );
     }
-    contractParams.forEach((param: TransitionParam, index: number) => {
+    contractParams.forEach((param: Field, index: number) => {
       init.push({
         vname: param.name,
-        type: param.type,
+        type: param.type.toString(),
         value: userSpecifiedArgs[index].toString(),
       });
     });
