@@ -3,6 +3,7 @@
 import { Transaction } from "@zilliqa-js/account";
 import { Contract, Init, Value } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
+import { Account } from "@zilliqa-js/account";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import fs from "fs";
 import { HardhatPluginError } from "hardhat/plugins";
@@ -19,6 +20,7 @@ export interface Setup {
   readonly version: number;
   readonly gasPrice: BN;
   readonly gasLimit: Long;
+  accounts: Account[]
 }
 
 export let setup: Setup | null = null;
@@ -33,17 +35,25 @@ export const initZilliqa = (
     gasPriceQa: number = 2000,
     gasLimit: number = 50000,
 ): Setup => {
-  setup = {
-    zilliqa: new Zilliqa(zilliqaNetworkUrl),
-    version: bytes.pack(chainId, 1),
-    gasPrice: units.toQa(gasPriceQa.toString(), units.Units.Li),
-    gasLimit: Long.fromNumber(gasLimit),
-    attempts: attempts,
-    timeout: timeoutMs,
-  };
+    let zilliqa = new Zilliqa(zilliqaNetworkUrl);
+    let accounts : Account[] = [ ];
 
-  privateKeys.forEach((pk) => setup!.zilliqa.wallet.addByPrivateKey(pk));
-  return setup;
+    privateKeys.forEach((pk) => {
+        zilliqa.wallet.addByPrivateKey(pk);
+        accounts.push(new Account(pk));
+    });
+
+    setup = {
+        zilliqa: new Zilliqa(zilliqaNetworkUrl),
+        version: bytes.pack(chainId, 1),
+        gasPrice: units.toQa(gasPriceQa.toString(), units.Units.Li),
+        gasLimit: Long.fromNumber(gasLimit),
+        attempts: attempts,
+        timeout: timeoutMs,
+        accounts : accounts
+    };
+
+    return setup;
 };
 
 function read(f: string) {
