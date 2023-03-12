@@ -85,7 +85,7 @@ await contract.Set(12);
 
 ### Get field value
 
-If a given contract has a filed named `msg` is possible to get its current value using a function call to `msg()`
+If a given contract has a field named `msg` is possible to get its current value using a function call to `msg()`
 
 ```typescript
 const msg = await contract.msg();
