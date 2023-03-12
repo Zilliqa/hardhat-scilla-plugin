@@ -85,7 +85,7 @@ await contract.Set(12);
 
 ### Get field value
 
-If a given contract has a field named `msg` is possible to get its current value using a function call to `msg()`
+If a given contract has a filed named `msg` is possible to get its current value using a function call to `msg()`
 
 ```typescript
 const msg = await contract.msg();
@@ -147,6 +147,7 @@ expect(tx).to.have.eventLogWithParams("getHello()", {value: "hello world"});
 ```
 
 for more tests please take look at [scilla tests](https://github.com/Zilliqa/Zilliqa/tree/master/tests/EvmAcceptanceTests/test/scilla).
+
 ### TODO
 
 - Support formatting complex data types such as `Map` and `List`
@@ -168,3 +169,24 @@ npx hardhat scilla-check --libdir path_to_stdlib contracts/scilla/helloWorld.sci
 ### TODO
 
 - Add `scilla-fmt` task
+
+### Running internal tests
+
+```sh
+yarn test
+```
+
+Will run all tests that don't require an external network (so that test passes will be deterministic).
+
+```sh
+yarn test-live
+```
+
+Will run just the tests that do require an external network.
+
+```sh
+yarn test-all
+```
+
+Will run both sets of tests.
+
