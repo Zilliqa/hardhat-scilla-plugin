@@ -172,7 +172,7 @@ async function deploy_from_file(
 
     if (!sc.isDeployed()) {
         let txnErrors = stringifyTransactionErrors(tx);
-        throw new Error(`Scilla contract was not deployed - status ${sc.status} from ${tx.id}, errors: ${txnErrors}`)
+        throw new HardhatPluginError(`Scilla contract was not deployed - status ${sc.status} from ${tx.id}, errors: ${txnErrors}`)
   }
   return [tx, sc];
 }
