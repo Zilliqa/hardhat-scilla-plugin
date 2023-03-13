@@ -80,7 +80,7 @@ function handleParam(param:Field, arg:any, init_call:boolean = true):Value{
         values.push(handleParam(param, arg[index],false))
       });
       const argtypes2 = param.typeobject.argtypes.map((x)=>x.type);
-      if (init_call==true){
+      if (init_call){
         const value = JSON.parse(JSON.stringify({
           constructor: param.typeobject.ctor,
           argtypes: argtypes2,
