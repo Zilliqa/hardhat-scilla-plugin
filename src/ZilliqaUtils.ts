@@ -39,3 +39,11 @@ export function stringifyTransactionErrors(txn : Transaction): string {
     }
     return result
 }
+
+/** Given a transaction, extract the event log in case you want to read parameters of it
+ */
+export async function getEventLog(tx: Transaction) : Promise<any> {
+    const receipt = tx.getReceipt()!;
+    const event_logs = receipt.event_logs!
+    return event_logs
+}

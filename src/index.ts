@@ -3,6 +3,7 @@ import { lazyFunction, lazyObject } from "hardhat/plugins";
 
 import { deploy, ScillaContract } from "./ScillaContractDeployer";
 import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
+import { loadZilliqaHardhatObject } from "./ZilliqaHardhatObject";
 import "./task-extensions";
 // This import is needed to let the TypeScript compiler know that it should include your type
 // extensions in your npm package's types file.
@@ -25,4 +26,5 @@ extendEnvironment((hre) => {
       return deploy(hre, contractName, ...args);
     }
   );
+  hre.zilliqa = lazyObject(() => loadZilliqaHardhatObject(hre));
 });
