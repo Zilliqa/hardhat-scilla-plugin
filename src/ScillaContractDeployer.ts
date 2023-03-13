@@ -63,8 +63,7 @@ export class ScillaContract extends Contract {
 function handleParam(param:Field, arg:any, init_call:boolean = true):Value{
   if (typeof param.typeobject == 'undefined'){
     throw new HardhatPluginError("hardhat-scilla-plugin", "Parameters were incorrectly parsed. Try clearing your scilla.cache file.")
-  } else {
-    if (typeof param.typeobject == 'string'){
+  } else if (typeof param.typeobject == 'string'){
       if (init_call){
         return {
           vname: param.name,
