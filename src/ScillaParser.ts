@@ -1,4 +1,5 @@
 const parse: any = require("s-expression");
+import { HardhatPluginError } from "hardhat/plugins";
 import { execSync } from "child_process";
 import fs from "fs";
 
@@ -34,7 +35,7 @@ export interface Transition {
 }
 
 export interface Field {
-  typeobject?: string | ADTField;
+  typeJSON?: string | ADTField; //Type in JSON format.
   name: string;
   type: string;
 }
@@ -186,7 +187,7 @@ function parseField(row : any):Field{
     const type = row[1];
     return {
       name: "",
-      typeobject: type,
+      typeJSON: type,
       type: type
     }
   } else if (field_type == "ADT"){
@@ -199,8 +200,8 @@ function parseField(row : any):Field{
     }
     return {
       name: name,
-      typeobject: ADT,
-      type: ctor + argtypes.map((arg:Field)=>` (${arg.type})`).join('')
+      typeJSON: ADT,
+      type: ctor + " " + argtypes.map((arg: Field) => arg.type).join(' ')
     }
   } else {
     throw new HardhatPluginError("hardhat-scilla-plugin", `Encountered unexpected field type ${row}`);

@@ -60,47 +60,64 @@ export class ScillaContract extends Contract {
   [key: string]: ContractFunction | any;
 }
 
-function handleParam(param:Field, arg:any, init_call:boolean = true):Value{
-  if (typeof param.typeobject == 'undefined'){
+function handleParam(param:Field, arg:any):Value{
+  if (typeof param.typeJSON == 'undefined'){
     throw new HardhatPluginError("hardhat-scilla-plugin", "Parameters were incorrectly parsed. Try clearing your scilla.cache file.")
-  } else if (typeof param.typeobject == 'string'){
-      if (init_call){
-        return {
-          vname: param.name,
-          type: param.type,
-          value: arg.toString(),
-        };
-      } else {
-        return arg.toString();
-      }
+  } else if (typeof param.typeJSON == 'string'){
+    return {
+      vname: param.name,
+      type: param.type,
+      value: arg.toString(),
     }
-    else{
-      const values : Value[] = [];
-      param.typeobject.argtypes.forEach((param:Field, index:number) => {
-        values.push(handleParam(param, arg[index],false))
-      });
-      const argtypes2 = param.typeobject.argtypes.map((x)=>x.type);
-      if (init_call){
-        const value = JSON.parse(JSON.stringify({
-          constructor: param.typeobject.ctor,
-          argtypes: argtypes2,
-          arguments: values
-        }));
-        return {
-          vname: param.name,
-          type: param.type,
-          value: value
-        }
-      } else {
-        return JSON.parse(JSON.stringify({
-          vname: param.name,
-          type: param.type,
-          constructor: param.typeobject.ctor,
-          argtypes: argtypes2,
-          arguments: values
-        }));
-      }
+  } else{
+    const values : Value[] = [];
+    param.typeJSON.argtypes.forEach((param:Field, index:number) => {
+      values.push(handleUnnamedParam(param, arg[index]));
+    });
+    const argtypes = param.typeJSON.argtypes.map((x)=>x.type);
+    /*
+      We use JSON.parse(JSON.strigify()) because we need to create a JSON with a constructor
+      field. Typescript expects this constructor to have the same type as an object
+      constructor which is not possible as it should be a string for our purposes. This trick
+      allows forces the typescript compiler to enforce this.
+    */
+    const value = JSON.parse(JSON.stringify({
+      constructor: param.typeJSON.ctor,
+      argtypes: argtypes,
+      arguments: values
+    }));
+    return {
+      vname: param.name,
+      type: param.type,
+      value: value
     }
+  }
+}
+
+function handleUnnamedParam(param:Field, arg:any):Value{
+  if (typeof param.typeJSON == 'undefined'){
+    throw new HardhatPluginError("hardhat-scilla-plugin", "Parameters were incorrectly parsed. Try clearing your scilla.cache file.")
+  } else if (typeof param.typeJSON == 'string'){
+    return arg.toString();
+  } else{
+    const values : Value[] = [];
+    param.typeJSON.argtypes.forEach((param:Field, index:number) => {
+      values.push(handleUnnamedParam(param, arg[index]))
+    });
+    const argtypes = param.typeJSON.argtypes.map((x)=>x.type);
+    /*
+      We use JSON.parse(JSON.strigify()) because we need to create a JSON with a constructor
+      field. Typescript expects this constructor to have the same type as an object
+      constructor which is not possible as it should be a string for our purposes. This trick
+      allows forces the typescript compiler to enforce this.
+    */
+    return JSON.parse(JSON.stringify({
+      vname: param.name,
+      type: param.type,
+      constructor: param.typeJSON.ctor,
+      argtypes: argtypes,
+      arguments: values
+    }));
   }
 }
 
