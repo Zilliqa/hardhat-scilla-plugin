@@ -10,7 +10,18 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { stringifyTransactionErrors } from "./ZilliqaUtils";
 
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
-import { Fields, isNumeric, TransitionParam } from "./ScillaParser";
+import { Field, Fields, isNumeric, TransitionParam } from "./ScillaParser";
+
+interface Value{
+  vname: string;
+  type: string;
+  value: string;
+}
+interface ADTValue {
+  constructor: string;
+  argtypes: string[];
+  arguments: (string | ADTValue)[];
+}
 
 export interface Setup {
   zilliqa: Zilliqa;
@@ -58,6 +69,68 @@ export class ScillaContract extends Contract {
   [key: string]: ContractFunction | any;
 }
 
+function handleParam(param:Field, arg:any):Value{
+  if (typeof param.typeJSON == 'undefined'){
+    throw new HardhatPluginError("hardhat-scilla-plugin", "Parameters were incorrectly parsed. Try clearing your scilla.cache file.")
+  } else if (typeof param.typeJSON == 'string'){
+    return {
+      vname: param.name,
+      type: param.type,
+      value: arg.toString(),
+    }
+  } else{
+    const values : Value[] = [];
+    param.typeJSON.argtypes.forEach((param:Field, index:number) => {
+      values.push(handleUnnamedParam(param, arg[index]));
+    });
+    const argtypes = param.typeJSON.argtypes.map((x)=>x.type);
+    /*
+      We use JSON.parse(JSON.strigify()) because we need to create a JSON with a constructor
+      field. Typescript expects this constructor to have the same type as an object
+      constructor which is not possible as it should be a string for our purposes. This trick
+      allows forces the typescript compiler to enforce this.
+    */
+    const value = JSON.parse(JSON.stringify({
+      constructor: param.typeJSON.ctor,
+      argtypes: argtypes,
+      arguments: values
+    }));
+    return {
+      vname: param.name,
+      type: param.type,
+      value: value
+    }
+  }
+}
+
+function handleUnnamedParam(param:Field, arg:any):Value{
+  if (typeof param.typeJSON == 'undefined'){
+    throw new HardhatPluginError("hardhat-scilla-plugin", "Parameters were incorrectly parsed. Try clearing your scilla.cache file.")
+  } else if (typeof param.typeJSON == 'string'){
+    return arg.toString();
+  } else{
+    const values : Value[] = [];
+    param.typeJSON.argtypes.forEach((param:Field, index:number) => {
+      values.push(handleUnnamedParam(param, arg[index]))
+    });
+    const argtypes = param.typeJSON.argtypes.map((x)=>x.type);
+    /*
+      We use JSON.parse(JSON.strigify()) because we need to create a JSON with a constructor
+      field. Typescript expects this constructor to have the same type as an object
+      constructor which is not possible as it should be a string for our purposes. This trick
+      allows forces the typescript compiler to enforce this.
+    */
+    return JSON.parse(JSON.stringify({
+      vname: param.name,
+      type: param.type,
+      constructor: param.typeJSON.ctor,
+      argtypes: argtypes,
+      arguments: values
+    }));
+  }
+}
+
+
 export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
@@ -94,11 +167,7 @@ export async function deploy(
 
       const values: Value[] = [];
       transition.params.forEach((param: TransitionParam, index: number) => {
-        values.push({
-          vname: param.name,
-          type: param.type,
-          value: args[index].toString(),
-        });
+        values.push(handleParam(param, args[index]));
       });
 
       return sc_call(sc, transition.name, values, new BN(amount));
@@ -131,10 +200,10 @@ const fillInit = (
         `Expected to receive ${contractParams.length} parameters for ${contractName} deployment but got ${userSpecifiedArgs.length}`
       );
     }
-    contractParams.forEach((param: TransitionParam, index: number) => {
+    contractParams.forEach((param: Field, index: number) => {
       init.push({
         vname: param.name,
-        type: param.type,
+        type: param.type.toString(),
         value: userSpecifiedArgs[index].toString(),
       });
     });

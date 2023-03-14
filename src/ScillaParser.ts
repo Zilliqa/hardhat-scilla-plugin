@@ -1,27 +1,30 @@
 const parse: any = require("s-expression");
+import { HardhatPluginError } from "hardhat/plugins";
 import { execSync } from "child_process";
 import fs from "fs";
 
-type ScillaDataType = string;
+export const isNumeric = (type: string | ADTField) => {
+  if (typeof type == "string"){
+    switch (type) {
+      case "Int64":
+      case "Int128":
+      case "Int256":
+      case "Uint32":
+      case "Uint64":
+      case "Uint128":
+      case "Uint256":
+        return true;
 
-export const isNumeric = (type: ScillaDataType) => {
-  switch (type) {
-    case "Int64":
-    case "Int128":
-    case "Int256":
-    case "Uint32":
-    case "Uint64":
-    case "Uint128":
-    case "Uint256":
-      return true;
-
-    default:
-      return false;
+      default:
+        return false;
+    }
+  } else {
+    return false;
   }
 };
 
 export interface TransitionParam {
-  type: ScillaDataType;
+  type: string;
   name: string;
 }
 
@@ -32,8 +35,14 @@ export interface Transition {
 }
 
 export interface Field {
-  type: ScillaDataType;
+  typeJSON?: string | ADTField; //Type in JSON format.
   name: string;
+  type: string;
+}
+
+export interface ADTField{
+  ctor: string
+  argtypes: Field[]
 }
 
 export type Transitions = Transition[];
@@ -159,12 +168,9 @@ const extractTransitions = (ccompsElem: any[]): Transitions => {
     }
 
     const compParams = compParamsData[1].map((row: any[][][]) => {
-      const primType = row[1][1];
-      const primName = row[0][1][1];
-      return {
-        type: primType,
-        name: primName,
-      };
+      const param = parseField(row[1]);
+      param.name = row[0][1][1];
+      return param;
     });
     return {
       type: compType,
@@ -173,3 +179,31 @@ const extractTransitions = (ccompsElem: any[]): Transitions => {
     };
   });
 };
+
+function parseField(row : any):Field{
+  const field_type = row[0];
+
+  if (field_type == "PrimType"){
+    const type = row[1];
+    return {
+      name: "",
+      typeJSON: type,
+      type: type
+    }
+  } else if (field_type == "ADT"){
+    const ctor = row[1][1][1];
+    const argtypes = row[2].map(parseField);
+    const name = row[0][1][1];
+    const ADT : ADTField = {
+      ctor: ctor,
+      argtypes: argtypes
+    }
+    return {
+      name: name,
+      typeJSON: ADT,
+      type: ctor + " " + argtypes.map((arg: Field) => arg.type).join(' ')
+    }
+  } else {
+    throw new HardhatPluginError("hardhat-scilla-plugin", `Encountered unexpected field type ${row}`);
+  }
+}
