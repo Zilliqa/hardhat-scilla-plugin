@@ -1,9 +1,13 @@
-import { Contract, Init } from "@zilliqa-js/contract";
+// This is necessary so that tsc can resolve some of the indirect types for
+// sc_call, otherwise it errors out - richard@zilliqa.com 2023-03-09
+import { Transaction } from "@zilliqa-js/account";
+import { Contract, Init, Value } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import fs from "fs";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { stringifyTransactionErrors } from "./ZilliqaUtils";
 
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
 import { Field, Fields, isNumeric, TransitionParam } from "./ScillaParser";
@@ -30,18 +34,23 @@ export interface Setup {
 
 export let setup: Setup | null = null;
 
+// The optional params are listed in popularity order.
 export const initZilliqa = (
-  zilliqaNetworkUrl: string,
-  chainId: number,
-  privateKeys: string[]
+    zilliqaNetworkUrl: string,
+    chainId: number,
+    privateKeys: string[],
+    attempts: number = 10,
+    timeoutMs: number = 1000,
+    gasPriceQa: number = 2000,
+    gasLimit: number = 50000,
 ): Setup => {
   setup = {
     zilliqa: new Zilliqa(zilliqaNetworkUrl),
     version: bytes.pack(chainId, 1),
-    gasPrice: units.toQa("2000", units.Units.Li),
-    gasLimit: Long.fromNumber(50000),
-    attempts: 10,
-    timeout: 1000,
+    gasPrice: units.toQa(gasPriceQa.toString(), units.Units.Li),
+    gasLimit: Long.fromNumber(gasLimit),
+    attempts: attempts,
+    timeout: timeoutMs,
   };
 
   privateKeys.forEach((pk) => setup!.zilliqa.wallet.addByPrivateKey(pk));
@@ -133,13 +142,15 @@ export async function deploy(
   }
 
   let sc: ScillaContract;
+  let tx: Transaction;
   const init: Init = fillInit(
     contractName,
     contractInfo.parsedContract.constructorParams,
     ...args
   );
 
-  sc = await deploy_from_file(contractInfo.path, init);
+  [tx,sc] = await deploy_from_file(contractInfo.path, init);
+  sc['deployed_by'] = tx
   contractInfo.parsedContract.transitions.forEach((transition) => {
     sc[transition.name] = async (...args: any[]) => {
       let amount = 0;
@@ -211,7 +222,7 @@ const fillInit = (
 async function deploy_from_file(
   path: string,
   init: Init
-): Promise<ScillaContract> {
+): Promise<[Transaction, ScillaContract]> {
   if (setup === null) {
     throw new HardhatPluginError(
       "hardhat-scilla-plugin",
@@ -221,14 +232,18 @@ async function deploy_from_file(
 
   const code = read(path);
   const contract = setup.zilliqa.contracts.new(code, init);
-  const [_, sc] = await contract.deploy(
+  const [tx, sc] = await contract.deploy(
     { ...setup },
     setup.attempts,
     setup.timeout,
     false
   );
 
-  return sc;
+    if (!sc.isDeployed()) {
+        let txnErrors = stringifyTransactionErrors(tx);
+        throw new HardhatPluginError(`Scilla contract was not deployed - status ${sc.status} from ${tx.id}, errors: ${txnErrors}`)
+  }
+  return [tx, sc];
 }
 
 // call a smart contract's transition with given args and an amount to send from a given public key
