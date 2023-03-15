@@ -54,6 +54,11 @@ export interface ParsedContract {
   constructorParams: Fields | null;
   transitions: Transitions;
   fields: Fields;
+  ctors: ScillaConstructor;
+}
+
+export interface ScillaConstructor{
+  [key:string]: Function | any;
 }
 
 export const parseScilla = (filename: string): ParsedContract => {
@@ -62,10 +67,17 @@ export const parseScilla = (filename: string): ParsedContract => {
   }
 
   const sexp = execSync(`scilla-fmt --sexp --human-readable ${filename}`);
-
   const result: any[] = parse(sexp.toString());
+  
+  const libr = result.filter((row: string[]) => row[0] === "libs")[0][1];
   const contr = result.filter((row: string[]) => row[0] === "contr")[0][1];
 
+  var ctors = {};
+
+  if (libr.length > 0){ // check to see if there is a lib associated with this contract
+    ctors = extractTypes(libr);
+  }
+  
   const contractName = extractContractName(contr);
   const contractParams = extractContractParams(contr);
 
@@ -80,8 +92,43 @@ export const parseScilla = (filename: string): ParsedContract => {
     transitions,
     fields,
     constructorParams: contractParams,
+    ctors: ctors
   };
 };
+
+const extractTypes = (lib:any) => {
+  let ctors:ScillaConstructor = {};
+  const lentries = lib[0][1][1];
+  for (var lentry of lentries){
+    const name = lentry[1][1][1];
+    switch(lentry[0]){
+      case "LibVar":
+        break;
+      case "LibTyp":
+        console.log("LibType");
+        console.log(name);
+
+        for (var typector of lentry[2]){
+          const typectorname = typector[0][1][1][1]
+          const typectorargtypes = typector[1][1].map(parseField);
+          console.log(typectorname);
+          console.log(typectorargtypes);
+
+          const createType = (args: any[]) => {
+            // TODO: Add dynamic type checking.
+            return{
+              constructor: typectorname,
+              argtypes: typectorargtypes,
+              args: args
+            }
+          }
+          ctors[typectorname] = createType;
+        }
+        break;
+    }
+  }
+  return ctors;
+}
 
 const extractContractName = (contrElem: any[]): ContractName => {
   return contrElem
