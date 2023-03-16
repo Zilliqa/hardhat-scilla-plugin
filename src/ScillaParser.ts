@@ -247,3 +247,21 @@ function parseField(row : any):Field{
     throw new HardhatPluginError("hardhat-scilla-plugin", `Encountered unexpected field type ${row}`);
   }
 }
+
+export function generateTypeConstructors(parsedCtors: ScillaConstructor[]){
+  console.log(parsedCtors);
+  var functions = {};
+  for (var parsedCtor of parsedCtors){
+    // We need to copy parsedCtor as it is placed in the closure of the function we are declaring so we do
+    // not want it to be modified by the floor loop.
+    const ctorForClosure : ScillaConstructor = Object.create(parsedCtor);
+    functions[ctorForClosure.ctorname]= (args: any[]) => {
+      // TODO: Add dynamic type checking.
+      return{
+        constructor: ctorForClosure.ctorname,
+        argtypes: ctorForClosure.argtypes,
+        args: args
+      }
+    };
+  }
+}
