@@ -184,6 +184,22 @@ export async function deploy(
     });
   });
 
+  // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
+  const parsedCtors = contractInfo.parsedContract.ctors;§
+  console.log(parsedCtors);
+  sc.ctors = {};
+  for (var parsedCtor of parsedCtors){
+    sc.ctors[parsedCtor.ctorname]= (args: any[]) => {
+      // TODO: Add dynamic type checking.
+      return{
+        constructor: parsedCtor.ctorname,
+        argtypes: parsedCtor.argtypes,
+        args: args
+      }
+    };
+  }
+  console.log(sc.ctors);
+
   return sc;
 }
 
