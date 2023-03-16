@@ -189,12 +189,14 @@ export async function deploy(
   console.log(parsedCtors);
   sc.ctors = {};
   for (var parsedCtor of parsedCtors){
-    sc.ctors = Object.assign(Object.create(sc.ctors), sc.ctors);
+    // We need to copy parsedCtor as it is placed in the closure of the function we are declaring so we do
+    // not want it to be modified by the floor loop.
+    const ctorForClosure = Object.create(parsedCtor);
     sc.ctors[parsedCtor.ctorname]= (args: any[]) => {
       // TODO: Add dynamic type checking.
       return{
-        constructor: parsedCtor.ctorname,
-        argtypes: parsedCtor.argtypes,
+        constructor: ctorForClosure.ctorname,
+        argtypes: ctorForClosure.argtypes,
         args: args
       }
     };
