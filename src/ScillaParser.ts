@@ -240,7 +240,7 @@ function parseField(row : any):Field{
     return {
       name: name,
       typeJSON: ADT,
-      type: ctor + " " + argtypes.map((arg: Field) => arg.type).join(' ')
+      type: ctor + argtypes.map((arg: Field) => " " + arg.type).join(' ')
     }
   } else {
     throw new HardhatPluginError("hardhat-scilla-plugin", `Encountered unexpected field type ${row}`);
