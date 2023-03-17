@@ -11,7 +11,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { stringifyTransactionErrors } from "./ZilliqaUtils";
 
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
-import { Field, Fields, isNumeric, TransitionParam } from "./ScillaParser";
+import { Field, Fields, isNumeric, TransitionParam, generateTypeConstructors } from "./ScillaParser";
 
 interface Value{
   vname: string;
@@ -193,6 +193,10 @@ export async function deploy(
       };
     });
   });
+
+  // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
+  const parsedCtors = contractInfo.parsedContract.ctors;
+  sc.ctors = generateTypeConstructors(parsedCtors);
 
   return sc;
 }

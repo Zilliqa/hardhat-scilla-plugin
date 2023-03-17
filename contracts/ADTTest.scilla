@@ -1,0 +1,28 @@
+scilla_version 0
+
+library ADTTest
+
+type SI =
+  | S of String
+  | I of Uint32
+
+type SIPair =
+  | A of Uint32
+  | B of String
+  | C of (SI) (SI)
+
+
+let twotwo : SIPair =
+  let s : String = "2" in
+  let i : Uint32 = Uint32 2 in
+  let ss : SI = S s in
+  let ii : SI = I i in
+  C ss ii
+  
+contract ADTTest()
+
+field var : SIPair = twotwo
+
+transition setPair(sipair: SIPair)
+  var := sipair 
+end
