@@ -75,7 +75,6 @@ export const parseScilla = (filename: string): ParsedContract => {
   const contr = result.filter((row: string[]) => row[0] === "contr")[0][1];
 
   const ctors = extractTypes(libr)
-  console.log(ctors);
   
   const contractName = extractContractName(contr);
   const contractParams = extractContractParams(contr);
@@ -249,8 +248,7 @@ function parseField(row : any):Field{
 }
 
 export function generateTypeConstructors(parsedCtors: ScillaConstructor[]){
-  console.log(parsedCtors);
-  var functions = {};
+  var functions :{[Key:string]:any} = {};
   for (var parsedCtor of parsedCtors){
     // We need to copy parsedCtor as it is placed in the closure of the function we are declaring so we do
     // not want it to be modified by the floor loop.
@@ -264,4 +262,5 @@ export function generateTypeConstructors(parsedCtors: ScillaConstructor[]){
       }
     };
   }
+  return functions;
 }

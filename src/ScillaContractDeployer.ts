@@ -10,7 +10,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { stringifyTransactionErrors } from "./ZilliqaUtils";
 
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
-import { Field, Fields, isNumeric, TransitionParam } from "./ScillaParser";
+import { Field, Fields, isNumeric, TransitionParam, generateTypeConstructors } from "./ScillaParser";
 
 interface Value{
   vname: string;
@@ -186,22 +186,7 @@ export async function deploy(
 
   // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
   const parsedCtors = contractInfo.parsedContract.ctors;
-  console.log(parsedCtors);
-  sc.ctors = {};
-  for (var parsedCtor of parsedCtors){
-    // We need to copy parsedCtor as it is placed in the closure of the function we are declaring so we do
-    // not want it to be modified by the floor loop.
-    const ctorForClosure = Object.create(parsedCtor);
-    sc.ctors[parsedCtor.ctorname]= (args: any[]) => {
-      // TODO: Add dynamic type checking.
-      return{
-        constructor: ctorForClosure.ctorname,
-        argtypes: ctorForClosure.argtypes,
-        args: args
-      }
-    };
-  }
-  console.log(sc.ctors);
+  sc.ctors = generateTypeConstructors(parsedCtors);
 
   return sc;
 }
