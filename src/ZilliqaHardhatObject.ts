@@ -5,6 +5,7 @@ import { Account, Wallet, Transaction } from "@zilliqa-js/account";
 import * as ScillaContractDeployer from "./ScillaContractDeployer";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { HardhatPluginError } from "hardhat/plugins";
+import * as zcyrpto from "@zilliqa-js/crypto"
 
 // We carefully don't cache the setup object, in case it changes underneath us.
 export class ZilliqaHardhatObject {
@@ -24,6 +25,11 @@ export class ZilliqaHardhatObject {
 
     getAccounts() : Account[] {
         return this.getZilliqaSetup().accounts;
+    }
+
+    createPrivateKey() {
+        const privateKey = zcyrpto.schnorr.generatePrivateKey();
+        return privateKey;
     }
 
     async getBalance(a : Account) : Promise<[BN, Number]> {
