@@ -11,7 +11,7 @@ describe("" , function () {
 
     before(async function () {
         const privateKeys = [ "d7ebc171562928a59aa8423e9b69393fe43a32f34b25dddc04f3f0dfe8881479" ];
-        const network_url = "http://localhost:8082";
+        const network_url = process.env.ZILLIQA_URL || "http://localhost:8082";
         const chain_id = 333;
 
         await initZilliqa(network_url, chain_id, privateKeys);
