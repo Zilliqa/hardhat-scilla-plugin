@@ -6,9 +6,9 @@
 
 This plugin is used to test scilla contracts in hardhat. It tries to be like ethers.js:
 * You can deploy contracts using their names.
-* You can transitions like a normal function call.
+* You can call transitions like a normal function call.
 * You can get field easily.
-* Custom chai matchers can be used to expect scilla events.
+* You can use custom chai matchers to expect scilla events.
 
 ## Installation
 
@@ -28,6 +28,7 @@ Or if you are using TypeScript, in your `hardhat.config.ts`:
 import "hardhat-scilla-plugin";
 ```
 
+You need to have `scilla-fmt` binary from the [Scilla project](https://github.com/Zilliqa/scilla/). It's used to parse scilla contracts and to provide better user experience while working with the plugin.
 ## Tasks
 
 This plugin adds the _scilla-check_ task to Hardhat:
