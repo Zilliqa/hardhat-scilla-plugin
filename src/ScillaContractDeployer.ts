@@ -24,6 +24,8 @@ interface ADTValue {
   arguments: (string | ADTValue)[];
 }
 
+export type AddressMap = { [address:string] : Account };
+
 export interface Setup {
   zilliqa: Zilliqa;
   readonly attempts: number;
@@ -31,7 +33,7 @@ export interface Setup {
   readonly version: number;
   readonly gasPrice: BN;
   readonly gasLimit: Long;
-  accounts: Account[]
+  accounts: AddressMap;
 }
 
 export let setup: Setup | null = null;
@@ -47,11 +49,12 @@ export const initZilliqa = (
     gasLimit: number = 50000,
 ): Setup => {
     let zilliqaObject = new Zilliqa(zilliqaNetworkUrl);
-    let accounts : Account[] = [ ];
+    let accounts : AddressMap = {};
 
     privateKeys.forEach((pk) => {
+        let account = new Account(pk);
         zilliqaObject.wallet.addByPrivateKey(pk);
-        accounts.push(new Account(pk));
+        accounts[account.address] = account;
     });
 
     setup = {
