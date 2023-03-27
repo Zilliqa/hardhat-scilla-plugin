@@ -21,9 +21,8 @@ describe("" , function () {
     describe("Zilliqa network APIs", function() {
         it("should have an account address", function () {
             expect(zobj.getAccounts()).to.exist;
-            expect(zobj.getAccounts().length).to.be.eq(1);
-            expect(zobj.getAccounts()[0].address).to.exist;
-            let addr = zobj.getAccounts()[0].address;
+            expect(zobj.getDefaultAccount()).to.exist;
+            let addr = zobj.getDefaultAccount()!.address;
             expect(addr.length).to.be.eq(42);
         });
     });

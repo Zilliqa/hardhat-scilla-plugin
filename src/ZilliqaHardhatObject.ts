@@ -7,7 +7,8 @@ import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { HardhatPluginError } from "hardhat/plugins";
 import * as zcyrpto from "@zilliqa-js/crypto"
 
-type AddressMap = ScillaContractDeployer.AddressMap;
+export type AddressMap = ScillaContractDeployer.AddressMap;
+export { Account } from "@zilliqa-js/account";
 
 // We carefully don't cache the setup object, in case it changes underneath us.
 export class ZilliqaHardhatObject {
@@ -29,7 +30,11 @@ export class ZilliqaHardhatObject {
         return this.getZilliqaSetup().accounts;
     }
 
-    getDefaultAccount(): Account | null {
+    getAccountByAddress(address: string) : Account | undefined {
+        return this.getAccounts()[address]
+    }
+    
+    getDefaultAccount(): Account | undefined {
         return this.getZilliqaSetup().zilliqa.wallet.defaultAccount;
     }
 
@@ -39,10 +44,10 @@ export class ZilliqaHardhatObject {
     addPrivateKey(privKey: string, makeDefault: boolean = false) : Account {
         let zobj = this.getZilliqaSetup();
         let account = new Account(privKey);
-        zobj.accounts.push(account);
-        zobj.wallet.addByPrivateKey(privKey);
+        zobj.accounts[account.address] = account
+        zobj.zilliqa.wallet.addByPrivateKey(privKey);
         if (makeDefault) {
-            zobj.wallet.setDefault(account.publicKey);
+            zobj.zilliqa.wallet.setDefault(account.publicKey);
         }
         return account
     }
@@ -79,6 +84,8 @@ export function loadZilliqaHardhatObject(hre : HardhatRuntimeEnvironment) : Zill
     return new ZilliqaHardhatObject()
 }
 
-// 'cos this is the easiest (if grottiest) way.
-export Account;
-export AddressMap;
+export function loadZilliqaHardhatObjectForTest() : ZilliqaHardhatObject {
+    return new ZilliqaHardhatObject()
+}
+
+

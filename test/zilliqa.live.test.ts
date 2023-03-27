@@ -5,10 +5,10 @@ import { existsSync, rmSync } from "fs";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 
 import { initZilliqa } from "../src/ScillaContractDeployer";
-import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
+import { ZilliqaHardhatObject, loadZilliqaHardhatObjectForTest } from "../src/ZilliqaHardhatObject";
 
 describe("" , function () {
-    let zobj : ZilliqaHardhatObject.ZilliqaHardhatObject;
+    let zobj : ZilliqaHardhatObject;
 
     before(async function () {
         //const privateKeys = [ "d7ebc171562928a59aa8423e9b69393fe43a32f34b25dddc04f3f0dfe8881479" ];
@@ -18,13 +18,15 @@ describe("" , function () {
         const chain_id = 333;
 
         await initZilliqa(network_url, chain_id, privateKeys);
-        zobj = new ZilliqaHardhatObject.ZilliqaHardhatObject();
+        // Users should use loadZilliqaHardhatObject(hre) - this is only here because the
+        // plugin unit tests aren't written with a hardhat object in scope.
+        zobj = loadZilliqaHardhatObjectForTest()
     });
 
     describe("Zilliqa network APIs", function() {
         // I happen to know that this account exists - rrw 2023-03-12
         it("Should be able to fetch a balance", async function () {
-            let account = zobj.getAccounts()[0];
+            let account = zobj.getDefaultAccount()!;
             let [bal, nonce] = await zobj.getBalance(account);
             expect(bal).to.exist;
             expect(bal.eq(new BN("0",10))).to.be.true;
