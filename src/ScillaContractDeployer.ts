@@ -13,6 +13,8 @@ import { stringifyTransactionErrors } from "./ZilliqaUtils";
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
 import { Field, Fields, isNumeric, TransitionParam, generateTypeConstructors } from "./ScillaParser";
 
+const NIL_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 interface Value{
   vname: string;
   type: string;
@@ -22,6 +24,22 @@ interface ADTValue {
   constructor: string;
   argtypes: string[];
   arguments: (string | ADTValue)[];
+}
+
+interface CallParams {
+    amount : BN;
+    gasPrice : BN;
+    gasLimit : Long;
+    pubKey? : string;
+    version : number;
+};
+
+interface DeployParams {
+    gasPrice : BN;
+    gasLimit : Long;
+    pubKey? : string;
+    version : number;
+    toAddr : string;
 }
 
 export type AddressMap = { [address:string] : Account };
@@ -143,65 +161,108 @@ function handleUnnamedParam(param:Field, arg:any):Value{
   }
 }
 
-
 export async function deploy(
-  hre: HardhatRuntimeEnvironment,
-  contractName: string,
+    hre: HardhatRuntimeEnvironment,
+    contractName: string,
   ...args: any[]
 ) {
-  const contractInfo: ContractInfo = hre.scillaContracts[contractName];
-  if (contractInfo === undefined) {
-    throw new Error(`Scilla contract ${contractName} doesn't exist.`);
-  }
+    deployWithAccount(hre, contractName, undefined, args)
+}
 
-  let sc: ScillaContract;
-  let tx: Transaction;
-  const init: Init = fillInit(
-    contractName,
-    contractInfo.parsedContract.constructorParams,
-    ...args
-  );
-
-  [tx,sc] = await deploy_from_file(contractInfo.path, init);
-  sc['deployed_by'] = tx
-  contractInfo.parsedContract.transitions.forEach((transition) => {
-    sc[transition.name] = async (...args: any[]) => {
-      let amount = 0;
-      if (args.length === transition.params.length + 1) {
-        // The last param is Tx info such as amount
-        const txParams = args.pop();
-        amount = txParams.amount ?? 0;
-      }
-      else if (args.length !== transition.params.length) {
-        throw new Error(
-          `Expected to receive ${transition.params.length} parameters for ${transition.name} but got ${args.length}`
+/* Find a contract from an address */
+export async function contractFromAddress(
+    hre : HardhatRuntimeEnvironment,
+    contractName: string,
+    address : string,
+    account : Account | undefined)
+{
+    const contractInfo: ContractInfo = hre.scillaContracts[contractName];
+    if (contractInfo === undefined) {
+        throw new Error(`Scilla contract ${contractName} doesn't exist.`);
+    }
+    if (setup === null) {
+        throw new HardhatPluginError(
+            "hardhat-scilla-plugin",
+            "Please call initZilliqa function."
         );
-      }
+    }
 
-      const values: Value[] = [];
-      transition.params.forEach((param: TransitionParam, index: number) => {
-        values.push(handleParam(param, args[index]));
-      });
+    let sc : ScillaContract = setup.zilliqa.contracts.at( address ) as ScillaContract;
+    sc = await decorateContract(contractInfo, sc, account)
 
-      return sc_call(sc, transition.name, values, new BN(amount));
-    };
+    return sc;
+}
 
-    contractInfo.parsedContract.fields.forEach((field) => {
-      sc[field.name] = async () => {
-        const state = await sc.getState();
-        if (isNumeric(field.type)) {
-          return Number(state[field.name]);
-        }
-        return state[field.name];
-      };
+
+export async function deployWithAccount(
+    hre: HardhatRuntimeEnvironment,
+    contractName: string,
+    account : Account | undefined,
+    ...args: any[]
+) {
+    const contractInfo: ContractInfo = hre.scillaContracts[contractName];
+    if (contractInfo === undefined) {
+        throw new Error(`Scilla contract ${contractName} doesn't exist.`);
+    }
+
+    let sc: ScillaContract;
+    let tx: Transaction;
+    const init: Init = fillInit(
+        contractName,
+        contractInfo.parsedContract.constructorParams,
+        ...args
+    );
+
+    [tx,sc] = await deploy_from_file(contractInfo.path, init, account);
+    sc['deploy_txn'] = tx
+    sc = await decorateContract(contractInfo, sc, account)
+
+    return sc;
+}
+
+async function decorateContract(
+    contractInfo: ContractInfo,
+    sc : ScillaContract,
+    account: Account | undefined) : Promise<ScillaContract>
+{
+    contractInfo.parsedContract.transitions.forEach((transition) => {
+        sc[transition.name] = async (...args: any[]) => {
+            let amount = 0;
+            if (args.length === transition.params.length + 1) {
+                // The last param is Tx info such as amount
+                const txParams = args.pop();
+                amount = txParams.amount ?? 0;
+            }
+            else if (args.length !== transition.params.length) {
+                throw new Error(
+                    `Expected to receive ${transition.params.length} parameters for ${transition.name} but got ${args.length}`
+                );
+            }
+
+            const values: Value[] = [];
+            transition.params.forEach((param: TransitionParam, index: number) => {
+                values.push(handleParam(param, args[index]));
+            });
+
+            return sc_call(sc, transition.name, values, new BN(amount), account);
+        };
+
+        contractInfo.parsedContract.fields.forEach((field) => {
+            sc[field.name] = async () => {
+                const state = await sc.getState();
+                if (isNumeric(field.type)) {
+                    return Number(state[field.name]);
+                }
+                return state[field.name];
+            };
+        });
     });
-  });
 
-  // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
-  const parsedCtors = contractInfo.parsedContract.ctors;
-  sc.ctors = generateTypeConstructors(parsedCtors);
+    // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
+    const parsedCtors = contractInfo.parsedContract.ctors;
+    sc.ctors = generateTypeConstructors(parsedCtors);
 
-  return sc;
+    return sc;
 }
 
 const fillInit = (
@@ -237,59 +298,72 @@ const fillInit = (
 
 // deploy a smart contract whose code is in a file with given init arguments
 async function deploy_from_file(
-  path: string,
-  init: Init
+    path: string,
+    init: Init,
+    account? : Account
 ): Promise<[Transaction, ScillaContract]> {
-  if (setup === null) {
-    throw new HardhatPluginError(
-      "hardhat-scilla-plugin",
-      "Please call initZilliqa function."
+    if (setup === null) {
+        throw new HardhatPluginError(
+            "hardhat-scilla-plugin",
+            "Please call initZilliqa function."
+        );
+    }
+
+    const code = read(path);
+    const contract = setup.zilliqa.contracts.new(code, init);
+    var params : DeployParams = { gasPrice: setup.gasPrice,
+                              gasLimit : setup.gasLimit,
+                              version: setup.version,
+                              toAddr: NIL_ADDRESS };
+    if (account !== undefined) {
+        params.pubKey = account.publicKey
+    };
+    const [tx, sc] = await contract.deploy(
+        params,
+        setup.attempts,
+        setup.timeout,
+        false
     );
-  }
-
-  const code = read(path);
-  const contract = setup.zilliqa.contracts.new(code, init);
-  const [tx, sc] = await contract.deploy(
-    { ...setup },
-    setup.attempts,
-    setup.timeout,
-    false
-  );
-
     if (!sc.isDeployed()) {
         let txnErrors = stringifyTransactionErrors(tx);
         throw new HardhatPluginError(`Scilla contract was not deployed - status ${sc.status} from ${tx.id}, errors: ${txnErrors}`)
-  }
-  return [tx, sc];
+    }
+    return [tx, sc];
 }
 
 // call a smart contract's transition with given args and an amount to send from a given public key
 export async function sc_call(
-  sc: Contract,
-  transition: string,
-  args: Value[] = [],
-  amt = new BN(0)
-  // caller_pub_key = setup.pub_keys[0]
+    sc: Contract,
+    transition: string,
+    args: Value[] = [],
+    amt = new BN(0),
+    account? : Account,
 ) {
-  if (setup === null) {
-    throw new HardhatPluginError(
-      "hardhat-scilla-plugin",
-      "Please call initZilliqa function."
-    );
-  }
+    if (setup === null) {
+        throw new HardhatPluginError(
+            "hardhat-scilla-plugin",
+            "Please call initZilliqa function."
+        );
+    }
 
-  return sc.call(
-    transition,
-    args,
-    {
-      version: setup.version,
-      amount: amt,
-      gasPrice: setup.gasPrice,
-      gasLimit: setup.gasLimit,
-      // pubKey: caller_pub_key
-    },
-    setup.attempts,
-    setup.timeout,
-    true
-  );
+    var params : CallParams = {
+        version: setup.version,
+        amount: amt,
+        gasPrice: setup.gasPrice,
+        gasLimit: setup.gasLimit,
+        // pubKey: caller_pub_key
+    };
+
+    if (account !== undefined) {
+        params.pubKey = account.publicKey
+    };
+    
+    return sc.call(
+        transition,
+        args,
+        params,
+        setup.attempts,
+        setup.timeout,
+        true
+    );
 }
