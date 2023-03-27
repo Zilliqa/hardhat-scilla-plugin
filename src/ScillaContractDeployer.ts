@@ -46,16 +46,16 @@ export const initZilliqa = (
     gasPriceQa: number = 2000,
     gasLimit: number = 50000,
 ): Setup => {
-    let zilliqa = new Zilliqa(zilliqaNetworkUrl);
+    let zilliqaObject = new Zilliqa(zilliqaNetworkUrl);
     let accounts : Account[] = [ ];
 
     privateKeys.forEach((pk) => {
-        zilliqa.wallet.addByPrivateKey(pk);
+        zilliqaObject.wallet.addByPrivateKey(pk);
         accounts.push(new Account(pk));
     });
 
     setup = {
-        zilliqa: new Zilliqa(zilliqaNetworkUrl),
+        zilliqa: zilliqaObject,
         version: bytes.pack(chainId, 1),
         gasPrice: units.toQa(gasPriceQa.toString(), units.Units.Li),
         gasLimit: Long.fromNumber(gasLimit),

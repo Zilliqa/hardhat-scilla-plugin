@@ -173,6 +173,8 @@ npx hardhat scilla-check --libdir path_to_stdlib contracts/scilla/helloWorld.sci
 
 ### Running internal tests
 
+Set `ZILLIQA_API_URL` to the URL of a network to test, or we'll use testnet by default.
+
 ```sh
 yarn test
 ```

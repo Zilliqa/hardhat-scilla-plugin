@@ -11,7 +11,7 @@ describe("", function () {
     let adtContract: ParsedContract;
     before(function () {
       contract = parseScilla("contracts/HelloWorld.scilla");
-      adtContract = parseScilla("contracts/adtTest.scilla");
+      adtContract = parseScilla("contracts/ADTTest.scilla");
     });
 
     it("Should have HelloWorld as the contract name", function () {
