@@ -33,7 +33,7 @@ export class ZilliqaHardhatObject {
     getAccountByAddress(address: string) : Account | undefined {
         return this.getAccounts()[address]
     }
-    
+
     getDefaultAccount(): Account | undefined {
         return this.getZilliqaSetup().zilliqa.wallet.defaultAccount;
     }

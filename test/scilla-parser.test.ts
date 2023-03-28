@@ -1,20 +1,25 @@
 import { expect } from "chai";
 import chai from "chai";
 import chaiSubset from "chai-subset";
+import path from "path";
+import { useEnvironment } from "./helpers";
 
 import { ParsedContract, parseScilla, generateTypeConstructors } from "../src/ScillaParser";
 chai.use(chaiSubset);
 
+const ContractDir = "contracts";
+
 describe("", function () {
+  useEnvironment("hardhat-project");
   describe("Scilla Parser", function () {
     let contract: ParsedContract;
     let adtContract: ParsedContract;
     before(function () {
-      contract = parseScilla("contracts/HelloWorld.scilla");
-      adtContract = parseScilla("contracts/ADTTest.scilla");
+        contract = parseScilla(path.join(ContractDir, "HelloWorld.scilla"));
+        adtContract = parseScilla(path.join(ContractDir, "ADTTest.scilla"));
     });
 
-    it("Should have HelloWorld as the contract name", function () {
+      it("Should have HelloWorld as the contract name", function () {
       expect(contract.name).to.be.eq("HelloWorld");
     });
 

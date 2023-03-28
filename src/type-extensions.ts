@@ -8,6 +8,7 @@ import { ScillaContract } from "./ScillaContractDeployer";
 import { ScillaContracts } from "./ScillaContractsInfoUpdater";
 // Called ZilliqaHardhatObject to distinguish it from @zilliqa-js/zilliqa:Zilliqa
 import { ZilliqaHardhatObject } from "./ZilliqaHardhatObject";
+import { Account } from "@zilliqa-js/account";
 
 declare module "hardhat/types/runtime" {
   // This is an example of an extension to the Hardhat Runtime Environment.
@@ -17,6 +18,11 @@ declare module "hardhat/types/runtime" {
     deployScilla: (
       contractName: string,
       ...args: any[]
+    ) => Promise<ScillaContract>;
+    deployScillaWithAccount: (
+        contractName: string,
+        account: Account | undefined,
+        ...args: any[]
     ) => Promise<ScillaContract>;
     zilliqa : ZilliqaHardhatObject;
   }

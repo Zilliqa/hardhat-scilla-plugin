@@ -20,9 +20,9 @@ type ContractMapByName = Record<ContractName, ContractInfo>;
 export type ScillaContracts = ContractMapByName;
 type ContractMapByPath = Record<ContractPath, ContractInfo>;
 
-export const updateContractsInfo = () => {
-  let contractsInfo: ContractMapByName = {};
-  const files = glob.sync("contracts/**/*.scilla");
+export const updateContractsInfo = (fromDir? : string) => {
+   let contractsInfo: ContractMapByName = {};
+  const files = glob.sync(fromDir ? path.join(fromDir, "/**/*.scilla") : "**/*.scilla");
   if (files.length === 0) {
     console.log(
       clc.yellowBright("No scilla contracts were found in contracts directory.")
@@ -30,7 +30,7 @@ export const updateContractsInfo = () => {
     return;
   }
 
-  contractsInfo = loadContractsInfo();
+  contractsInfo = loadContractsInfo(fromDir);
 
   let somethingChanged = false;
   files.forEach((file) => {
@@ -53,8 +53,7 @@ export const updateContractsInfo = () => {
   });
 
   if (somethingChanged) {
-    console.log("Cache updated.");
-    saveContractsInfo(contractsInfo);
+      saveContractsInfo(contractsInfo, fromDir);
   } else {
     console.log("Nothing changed since last compile.");
   }
@@ -78,19 +77,21 @@ const convertToMapByName = (
   return contractsByName;
 };
 
-const loadContractsInfo = (): ContractMapByPath => {
-  if (!fs.existsSync(CONTRACTS_INFO_CACHE_FILE)) {
-    console.log("Cache file doesn't exist, creating a new one");
+const loadContractsInfo = (fromDir? : string): ContractMapByPath => {
+  let cachePath = fromDir ? path.join(fromDir, CONTRACTS_INFO_CACHE_FILE) : CONTRACTS_INFO_CACHE_FILE;
+  if (!fs.existsSync(cachePath)) {
     return {};
   }
 
-  const contents = fs.readFileSync(CONTRACTS_INFO_CACHE_FILE, "utf8");
+  const contents = fs.readFileSync(cachePath, "utf8");
   return JSON.parse(contents);
 };
 
-const saveContractsInfo = (contracts: ContractMapByPath) => {
-  fs.mkdirSync(dirname(CONTRACTS_INFO_CACHE_FILE), { recursive: true });
-  fs.writeFileSync(CONTRACTS_INFO_CACHE_FILE, JSON.stringify(contracts));
+const saveContractsInfo = (contracts: ContractMapByPath, fromDir?: string) => {
+    let cachePath = fromDir ? path.join(fromDir, CONTRACTS_INFO_CACHE_FILE) : CONTRACTS_INFO_CACHE_FILE;
+    console.log(`Saving contract info to {cachePath}`);
+  fs.mkdirSync(dirname(cachePath), { recursive: true });
+  fs.writeFileSync(cachePath, JSON.stringify(contracts));
 };
 
 const getFileHash = (fileName: string): string => {

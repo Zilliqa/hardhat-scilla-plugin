@@ -4,10 +4,12 @@ import chaiSubset from "chai-subset";
 import { existsSync, rmSync } from "fs";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 
+import { useEnvironment } from "./helpers";
 import { initZilliqa } from "../src/ScillaContractDeployer";
 import { ZilliqaHardhatObject, loadZilliqaHardhatObjectForTest } from "../src/ZilliqaHardhatObject";
 
 describe("" , function () {
+    useEnvironment("hardhat-project")
     let zobj : ZilliqaHardhatObject;
 
     before(async function () {
@@ -18,16 +20,13 @@ describe("" , function () {
         const chain_id = 333;
 
         await initZilliqa(network_url, chain_id, privateKeys);
-        // Users should use loadZilliqaHardhatObject(hre) - this is only here because the
-        // plugin unit tests aren't written with a hardhat object in scope.
-        zobj = loadZilliqaHardhatObjectForTest()
     });
 
     describe("Zilliqa network APIs", function() {
         // I happen to know that this account exists - rrw 2023-03-12
         it("Should be able to fetch a balance", async function () {
-            let account = zobj.getDefaultAccount()!;
-            let [bal, nonce] = await zobj.getBalance(account);
+            let account = this.hre.zilliqa.getDefaultAccount()!;
+            let [bal, nonce] = await this.hre.zilliqa.getBalance(account);
             expect(bal).to.exist;
             expect(bal.eq(new BN("0",10))).to.be.true;
             expect(nonce).to.be.eq(-1);

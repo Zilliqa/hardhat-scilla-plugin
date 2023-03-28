@@ -61,7 +61,8 @@ export const initZilliqa = (
     zilliqaNetworkUrl: string,
     chainId: number,
     privateKeys: string[],
-    attempts: number = 10,
+    // This used to be 10, but this is rather too few for testnet - rrw 2023-03-28
+    attempts: number = 20,
     timeoutMs: number = 1000,
     gasPriceQa: number = 2000,
     gasLimit: number = 50000,
@@ -166,7 +167,7 @@ export async function deploy(
     contractName: string,
   ...args: any[]
 ) {
-    deployWithAccount(hre, contractName, undefined, args)
+    return deployWithAccount(hre, contractName, undefined, args)
 }
 
 /* Find a contract from an address */

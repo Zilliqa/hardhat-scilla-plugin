@@ -2,6 +2,9 @@ import { expect } from "chai";
 import chai from "chai";
 import chaiSubset from "chai-subset";
 import { existsSync, rmSync } from "fs";
+import path from "path";
+import process from "process";
+import { useEnvironment } from "./helpers";
 
 import {
   ContractInfo,
@@ -10,26 +13,31 @@ import {
 } from "../src/ScillaContractsInfoUpdater";
 chai.use(chaiSubset);
 
+const ContractDir = ".";
+
 describe("", function () {
+  useEnvironment("hardhat-project")
   before(function () {
-    rmSync("artifacts/scilla.cache", { force: true });
+      rmSync(path.join(ContractDir, "artifacts/scilla.cache"), { force: true });
   });
 
   after(function () {
-    rmSync("artifacts/scilla.cache", { force: true });
+      rmSync(path.join(ContractDir, "artifacts/scilla.cache"), { force: true });
   });
 
   describe("Scilla Contract Updater", function () {
     let helloContract: ContractInfo;
-    it("Should create scilla.cache if updateContractInfo is called", function () {
-      updateContractsInfo();
-      expect(existsSync("artifacts/scilla.cache")).to.be.true;
+      it("Should create scilla.cache if updateContractInfo is called", function () {
+          console.log("------");
+          console.log(` cwd ${process.cwd()}`);
+        updateContractsInfo(ContractDir);
+        expect(existsSync(path.join(ContractDir, "artifacts/scilla.cache"))).to.be.true;
     });
 
     it("should have correct contract path", function () {
       const contracts = loadScillaContractsInfo();
       helloContract = contracts.HelloWorld;
-      expect(helloContract.path).to.be.eq("contracts/HelloWorld.scilla");
+      expect(helloContract.path.endsWith("contracts/HelloWorld.scilla")).to.be.true;
     });
 
     it("Should have HelloWorld as the contract name", function () {
