@@ -1,7 +1,7 @@
 // This is necessary so that tsc can resolve some of the indirect types for
 // sc_call, otherwise it errors out - richard@zilliqa.com 2023-03-09
 import { Transaction } from "@zilliqa-js/account";
-import { Contract, Init } from "@zilliqa-js/contract";
+import { Contract, Init, State } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Account } from "@zilliqa-js/account";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
@@ -197,11 +197,13 @@ export async function deploy(
   if (contractInfo.parsedContract.constructorParams) {
     contractInfo.parsedContract.constructorParams.forEach((field) => {
       sc[field.name] = async () => {
-        const state = await sc.getState();
+        const states: State = await sc.getInit();
+        const state = states.filter((s: { vname: string; }) => s.vname === field.name)[0];
+
         if (isNumeric(field.type)) {
-          return Number(state[field.name]);
+          return Number(state.value);
         }
-        return state[field.name];
+        return state.value;
       };
     });
   }
