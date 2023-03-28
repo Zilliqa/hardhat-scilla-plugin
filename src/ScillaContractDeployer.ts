@@ -182,8 +182,20 @@ export async function deploy(
 
       return sc_call(sc, transition.name, values, new BN(amount));
     };
+  });
 
-    contractInfo.parsedContract.fields.forEach((field) => {
+  contractInfo.parsedContract.fields.forEach((field) => {
+    sc[field.name] = async () => {
+      const state = await sc.getState();
+      if (isNumeric(field.type)) {
+        return Number(state[field.name]);
+      }
+      return state[field.name];
+    };
+  });
+
+  if (contractInfo.parsedContract.constructorParams) {
+    contractInfo.parsedContract.constructorParams.forEach((field) => {
       sc[field.name] = async () => {
         const state = await sc.getState();
         if (isNumeric(field.type)) {
@@ -192,7 +204,7 @@ export async function deploy(
         return state[field.name];
       };
     });
-  });
+  }
 
   // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
   const parsedCtors = contractInfo.parsedContract.ctors;
