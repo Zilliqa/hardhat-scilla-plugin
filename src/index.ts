@@ -9,7 +9,7 @@ import "./task-extensions";
 // extensions in your npm package's types file.
 import "./type-extensions";
 
-export { ScillaContract, initZilliqa, Setup } from "./ScillaContractDeployer";
+export { ScillaContract, Setup , initZilliqa, setAccount} from "./ScillaContractDeployer";
 
 export { scillaChaiEventMatcher } from "./ScillaChaiMatchers";
 
