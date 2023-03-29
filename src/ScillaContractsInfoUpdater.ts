@@ -21,8 +21,10 @@ export type ScillaContracts = ContractMapByName;
 type ContractMapByPath = Record<ContractPath, ContractInfo>;
 
 export const updateContractsInfo = (fromDir? : string) => {
-   let contractsInfo: ContractMapByName = {};
-  const files = glob.sync(fromDir ? path.join(fromDir, "/**/*.scilla") : "**/*.scilla");
+  let contractsInfo: ContractMapByName = {};
+  const rawFiles = glob.sync(fromDir ? path.join(fromDir, "/**/*.scilla") : "**/*.scilla");
+  const nodeModules = fromDir ? path.join(fromDir, "node_modules/") : "node_modules/";
+  const files = rawFiles.filter( (f: string) => { console.log(`F= ${f}`); return !f.startsWith( nodeModules ) } )
   if (files.length === 0) {
     console.log(
       clc.yellowBright("No scilla contracts were found in contracts directory.")
@@ -89,7 +91,7 @@ const loadContractsInfo = (fromDir? : string): ContractMapByPath => {
 
 const saveContractsInfo = (contracts: ContractMapByPath, fromDir?: string) => {
     let cachePath = fromDir ? path.join(fromDir, CONTRACTS_INFO_CACHE_FILE) : CONTRACTS_INFO_CACHE_FILE;
-    console.log(`Saving contract info to {cachePath}`);
+    console.log(`Saving contract info to ${cachePath}`);
   fs.mkdirSync(dirname(cachePath), { recursive: true });
   fs.writeFileSync(cachePath, JSON.stringify(contracts));
 };

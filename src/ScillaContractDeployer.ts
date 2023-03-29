@@ -167,7 +167,7 @@ export async function deploy(
     contractName: string,
   ...args: any[]
 ) {
-    return deployWithAccount(hre, contractName, undefined, args)
+    return deployWithAccount(hre, contractName, undefined, ...args)
 }
 
 /* Find a contract from an address */
