@@ -72,6 +72,16 @@ function read(f: string) {
   return t;
 }
 
+export function setAccount(accountNumber:number){
+  if (setup === null) {
+    throw new HardhatPluginError(
+      "hardhat-scilla-plugin",
+      "Please call initZilliqa function."
+    );
+  }
+  setup.zilliqa.wallet.defaultAccount = setup.accounts[accountNumber];
+}
+
 export type ContractFunction<T = any> = (...args: any[]) => Promise<T>;
 
 export class ScillaContract extends Contract {
