@@ -200,7 +200,8 @@ export async function deployWithAccount(
     contractName: string,
     account : Account | undefined,
     ...args: any[]
-) {
+) 
+{
     const contractInfo: ContractInfo = hre.scillaContracts[contractName];
     if (contractInfo === undefined) {
         throw new Error(`Scilla contract ${contractName} doesn't exist.`);
@@ -217,7 +218,7 @@ export async function deployWithAccount(
     [tx,sc] = await deploy_from_file(contractInfo.path, init, account);
     sc['deploy_txn'] = tx
     sc = await decorateContract(contractInfo, sc, account)
-
+    
     return sc;
 }
 
@@ -226,6 +227,15 @@ async function decorateContract(
     sc : ScillaContract,
     account: Account | undefined) : Promise<ScillaContract>
 {
+    // We set three special fields ctors, connect and account.
+    // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
+    const parsedCtors = contractInfo.parsedContract.ctors;
+    sc.ctors = generateTypeConstructors(parsedCtors);
+    sc.account = account;
+    sc.connect = (account : Account) => {
+      sc.account = account;
+    }
+
     contractInfo.parsedContract.transitions.forEach((transition) => {
         sc[transition.name] = async (...args: any[]) => {
             let amount = 0;
@@ -244,8 +254,7 @@ async function decorateContract(
             transition.params.forEach((param: TransitionParam, index: number) => {
                 values.push(handleParam(param, args[index]));
             });
-
-            return sc_call(sc, transition.name, values, new BN(amount), account);
+            return sc_call(sc, transition.name, values, new BN(amount), sc.account);
         };
 
         contractInfo.parsedContract.fields.forEach((field) => {
@@ -258,10 +267,6 @@ async function decorateContract(
             };
         });
     });
-
-    // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
-    const parsedCtors = contractInfo.parsedContract.ctors;
-    sc.ctors = generateTypeConstructors(parsedCtors);
 
     return sc;
 }
