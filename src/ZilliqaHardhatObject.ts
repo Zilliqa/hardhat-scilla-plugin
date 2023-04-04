@@ -26,12 +26,12 @@ export class ZilliqaHardhatObject {
         return this.getZilliqaSetup().zilliqa
     }
 
-    getAccounts() : AddressMap {
+    getAccounts() : Account[] {
         return this.getZilliqaSetup().accounts;
     }
 
     getAccountByAddress(address: string) : Account | undefined {
-        return this.getAccounts()[address]
+        return this.getZilliqaSetup().zilliqa.wallet.accounts[address];
     }
 
     getDefaultAccount(): Account | undefined {
@@ -44,7 +44,7 @@ export class ZilliqaHardhatObject {
     addPrivateKey(privKey: string, makeDefault: boolean = false) : Account {
         let zobj = this.getZilliqaSetup();
         let account = new Account(privKey);
-        zobj.accounts[account.address] = account
+        zobj.accounts.push(account);
         zobj.zilliqa.wallet.addByPrivateKey(privKey);
         if (makeDefault) {
             zobj.zilliqa.wallet.setDefault(account.publicKey);

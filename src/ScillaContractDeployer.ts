@@ -51,7 +51,7 @@ export interface Setup {
   readonly version: number;
   readonly gasPrice: BN;
   readonly gasLimit: Long;
-  accounts: AddressMap;
+  accounts: Account[];
 }
 
 export let setup: Setup | null = null;
@@ -68,12 +68,12 @@ export const initZilliqa = (
     gasLimit: number = 50000,
 ): Setup => {
     let zilliqaObject = new Zilliqa(zilliqaNetworkUrl);
-    let accounts : AddressMap = {};
+    let accounts : Account[] = [];
 
     privateKeys.forEach((pk) => {
         let account = new Account(pk);
         zilliqaObject.wallet.addByPrivateKey(pk);
-        accounts[account.address] = account;
+        accounts.push(account);
     });
 
     setup = {
