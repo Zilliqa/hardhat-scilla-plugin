@@ -252,7 +252,7 @@ export const deployLibrary = async (
 
   let sc: ScillaContract;
   let tx: Transaction;
-  const init: Init = fillLibraryInit(libraryName);
+  const init: Init = fillLibraryInit();
 
   [tx, sc] = await deploy_from_file(contractInfo.path, init);
   sc.deployed_by = tx;
@@ -260,7 +260,7 @@ export const deployLibrary = async (
   return sc;
 };
 
-const fillLibraryInit = (contractName: string): Init => {
+const fillLibraryInit = (): Init => {
   const init = [
     {
       vname: "_scilla_version",
