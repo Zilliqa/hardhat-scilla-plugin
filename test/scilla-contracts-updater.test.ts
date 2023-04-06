@@ -21,8 +21,8 @@ describe("", function () {
 
   describe("Scilla Contract Updater", function () {
     let helloContract: ContractInfo;
-    it("Should create scilla.cache if updateContractInfo is called", function () {
-      updateContractsInfo();
+    it("Should create scilla.cache if updateContractInfo is called", async function () {
+      await updateContractsInfo();
       expect(existsSync("artifacts/scilla.cache")).to.be.true;
     });
 

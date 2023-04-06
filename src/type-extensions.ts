@@ -18,6 +18,7 @@ declare module "hardhat/types/runtime" {
       contractName: string,
       ...args: any[]
     ) => Promise<ScillaContract>;
-    zilliqa : ZilliqaHardhatObject;
+    deployScillaLibrary: (contractName: string) => Promise<ScillaContract>;
+    zilliqa: ZilliqaHardhatObject;
   }
 }

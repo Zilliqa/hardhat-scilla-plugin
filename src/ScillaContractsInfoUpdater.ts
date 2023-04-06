@@ -4,7 +4,7 @@ import fs from "fs";
 import { glob } from "glob";
 import path, { dirname } from "path";
 
-import { ContractName, ParsedContract, parseScilla } from "./ScillaParser";
+import { ContractName, ParsedContract, parseScilla, parseScillaLibrary } from "./ScillaParser";
 
 // For some reason, hardhat deletes json files in artifacts, so it couldn't be scilla.json
 const CONTRACTS_INFO_CACHE_FILE = "artifacts/scilla.cache";
@@ -20,9 +20,9 @@ type ContractMapByName = Record<ContractName, ContractInfo>;
 export type ScillaContracts = ContractMapByName;
 type ContractMapByPath = Record<ContractPath, ContractInfo>;
 
-export const updateContractsInfo = () => {
+export const updateContractsInfo = async () => {
   let contractsInfo: ContractMapByName = {};
-  const files = glob.sync("contracts/**/*.scilla");
+  const files = glob.sync("contracts/**/*(*.scilla|*.scillib)");
   if (files.length === 0) {
     console.log(
       clc.yellowBright("No scilla contracts were found in contracts directory.")
@@ -33,7 +33,7 @@ export const updateContractsInfo = () => {
   contractsInfo = loadContractsInfo();
 
   let somethingChanged = false;
-  files.forEach((file) => {
+  for (const file of files) {
     if (
       file in contractsInfo &&
       contractsInfo[file].hash === getFileHash(file)
@@ -42,7 +42,7 @@ export const updateContractsInfo = () => {
     }
 
     // Either the file is new or has been changed
-    const contract = parseScillaFile(file);
+    const contract = await parseScillaFile(file);
     console.log(`Parsing ${file}...`);
     if (contract) {
       somethingChanged = true;
@@ -50,7 +50,7 @@ export const updateContractsInfo = () => {
     } else {
       console.log(clc.redBright("  Failed!"));
     }
-  });
+  };
 
   if (somethingChanged) {
     console.log("Cache updated.");
@@ -100,12 +100,17 @@ const getFileHash = (fileName: string): string => {
   return hashSum.digest("hex");
 };
 
-const parseScillaFile = (fileName: string): ContractInfo | null => {
+const parseScillaFile = async (fileName: string): Promise<ContractInfo | null> => {
   const contents = fs.readFileSync(fileName, "utf8");
   const hashSum = createHash("md5");
   hashSum.update(contents);
 
-  const parsedContract = parseScilla(fileName);
+  let parsedContract;
+  if (path.extname(fileName) === ".scillib") {
+    parsedContract = await parseScillaLibrary(fileName);
+  }else {
+    parsedContract = parseScilla(fileName);
+  }
 
   return { hash: hashSum.digest("hex"), path: fileName, parsedContract };
 };

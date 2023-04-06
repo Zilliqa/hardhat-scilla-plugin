@@ -35,8 +35,8 @@ task(
     });
   });
 
-task("compile").setAction((taskArgs, hre, runSuper) => {
+task("compile").setAction(async (taskArgs, hre, runSuper) => {
   console.log(clc.blue.bold("Scilla Contracts: "));
-  updateScillaContractsInfo();
+  await updateScillaContractsInfo();
   return runSuper();
 });

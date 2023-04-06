@@ -1,8 +1,8 @@
 {
   "name": "hardhat-scilla-plugin",
-  "version": "1.8.1",
+  "version": "2.1.1",
   "description": "Hardhat TypeScript plugin for scilla testing",
-  "repository": "github:its-saeed/scilla-hardhat-plugin",
+  "repository": "github:Zilliqa/hardhat-scilla-plugin",
   "author": "Saeed Dadkhah",
   "license": "MIT",
   "main": "dist/src/index.js",
@@ -20,7 +20,7 @@
     "lint": "tslint --config tslint.json --project tsconfig.json",
     "test": "mocha --exit --recursive 'test/**/*.test.ts' --exclude 'test/**/*.live.test.ts'",
     "test-all": "mocha --exit --recursive 'test/**/*.test.ts'",
-    "test-live" : "mocha --exit --recursive 'test/**/*.live.test.ts'",
+    "test-live": "mocha --exit --recursive 'test/**/*.live.test.ts'",
     "build": "tsc",
     "watch": "tsc -w",
     "prepublishOnly": "npm run build"
@@ -45,6 +45,7 @@
     "cli-color": "^2.0.3",
     "glob": "^8.0.3",
     "hardhat": "^2.0.0",
+    "local-package-publisher": "^1.0.4",
     "mocha": "^7.1.2",
     "prettier": "2.0.5",
     "s-expression": "^3.1.1",
