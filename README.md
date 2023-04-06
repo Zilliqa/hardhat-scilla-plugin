@@ -71,8 +71,13 @@ const network_url = "http://localhost:5555";
 const chain_id = 1;
 initZilliqa(network_url, chain_id, privateKeys);
 
-let contract: ScillaContract = await hre.deploy("SetGet");
-let contract: ScillaContract = await hre.deploy("HelloWorld", "Hello World"); // Contract with initial parameters.
+let contract: ScillaContract = await hre.deployScilla("SetGet");
+let contract: ScillaContract = await hre.deployScilla("HelloWorld", "Hello World"); // Contract with initial parameters.
+```
+
+In the same way, you can deploy your libraries with their names:
+```typescript
+let library: ScillaContract = await hre.deployScillaLibrary("MyLibrary");
 ```
 
 ### Call a transition
