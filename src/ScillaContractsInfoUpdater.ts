@@ -22,7 +22,7 @@ type ContractMapByPath = Record<ContractPath, ContractInfo>;
 
 export const updateContractsInfo = async () => {
   let contractsInfo: ContractMapByName = {};
-  const files = glob.sync("contracts/**/*.scilla | contracts/**/*.scillib");
+  const files = glob.sync("contracts/**/*(*.scilla|*.scillib)");
   if (files.length === 0) {
     console.log(
       clc.yellowBright("No scilla contracts were found in contracts directory.")
@@ -33,7 +33,7 @@ export const updateContractsInfo = async () => {
   contractsInfo = loadContractsInfo();
 
   let somethingChanged = false;
-  files.forEach(async (file) => {
+  for (const file of files) {
     if (
       file in contractsInfo &&
       contractsInfo[file].hash === getFileHash(file)
@@ -50,7 +50,7 @@ export const updateContractsInfo = async () => {
     } else {
       console.log(clc.redBright("  Failed!"));
     }
-  });
+  };
 
   if (somethingChanged) {
     console.log("Cache updated.");
@@ -106,7 +106,7 @@ const parseScillaFile = async (fileName: string): Promise<ContractInfo | null> =
   hashSum.update(contents);
 
   let parsedContract;
-  if (path.extname(fileName) === "scillib") {
+  if (path.extname(fileName) === ".scillib") {
     parsedContract = await parseScillaLibrary(fileName);
   }else {
     parsedContract = parseScilla(fileName);
