@@ -1,6 +1,7 @@
 const parse: any = require("s-expression");
 import { execSync } from "child_process";
 import fs from "fs";
+const readline = require('readline');
 import { HardhatPluginError } from "hardhat/plugins";
 
 export const isNumeric = (type: string | ADTField) => {
@@ -61,6 +62,35 @@ export interface ScillaConstructor {
   typename: string;
   ctorname: string;
   argtypes: string[];
+}
+
+export const parseScillaLibrary = async (filename: string): Promise<ParsedContract> => {
+  if (!fs.existsSync(filename)) {
+    throw new Error(`${filename} doesn't exist.`);
+  }
+
+    const fileStream = fs.createReadStream(filename);
+
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity
+  });
+
+  let libraryName
+  for await (const line of rl) {
+    if (line.trim().startsWith("library")) {
+      libraryName = line.trim().split(' ')[1];
+      break;
+    }
+  }
+
+  return {
+    name: libraryName,
+    transitions: [],
+    fields: [],
+    constructorParams: [],
+    ctors: [],
+  }
 }
 
 export const parseScilla = (filename: string): ParsedContract => {

@@ -6,11 +6,12 @@ import {
   generateTypeConstructors,
   ParsedContract,
   parseScilla,
+  parseScillaLibrary,
 } from "../src/ScillaParser";
 chai.use(chaiSubset);
 
 describe("", function () {
-  describe("Scilla Parser", function () {
+  describe("Scilla Parser should parse contracts successfully", function () {
     let contract: ParsedContract;
     let adtContract: ParsedContract;
     before(function () {
@@ -95,6 +96,16 @@ describe("", function () {
         argtypes: [{ name: "", typeJSON: "Uint32", type: "Uint32" }],
         args: 1,
       });
+    });
+  });
+
+  describe("Scilla Parser should parse libraries successfully", function () {
+    let contract: ParsedContract;
+    before(async function () {
+      contract = await parseScillaLibrary("contracts/AdditionLib.scillib");
+    });
+    it("Should extract library name", function () {
+      expect(contract.name).to.be.eq("AdditionLib")
     });
   });
 });
