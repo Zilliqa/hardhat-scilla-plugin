@@ -105,7 +105,7 @@ describe("", function () {
       contract = await parseScillaLibrary("contracts/AdditionLib.scillib");
     });
     it("Should extract library name", function () {
-      expect(contract.name).to.be.eq("AdditionLib")
+      expect(contract.name).to.be.eq("AdditionLib");
     });
   });
 });

@@ -4,7 +4,12 @@ import fs from "fs";
 import { glob } from "glob";
 import path, { dirname } from "path";
 
-import { ContractName, ParsedContract, parseScilla, parseScillaLibrary } from "./ScillaParser";
+import {
+  ContractName,
+  ParsedContract,
+  parseScilla,
+  parseScillaLibrary,
+} from "./ScillaParser";
 
 // For some reason, hardhat deletes json files in artifacts, so it couldn't be scilla.json
 const CONTRACTS_INFO_CACHE_FILE = "artifacts/scilla.cache";
@@ -50,7 +55,7 @@ export const updateContractsInfo = async () => {
     } else {
       console.log(clc.redBright("  Failed!"));
     }
-  };
+  }
 
   if (somethingChanged) {
     console.log("Cache updated.");
@@ -100,7 +105,9 @@ const getFileHash = (fileName: string): string => {
   return hashSum.digest("hex");
 };
 
-const parseScillaFile = async (fileName: string): Promise<ContractInfo | null> => {
+const parseScillaFile = async (
+  fileName: string
+): Promise<ContractInfo | null> => {
   const contents = fs.readFileSync(fileName, "utf8");
   const hashSum = createHash("md5");
   hashSum.update(contents);
@@ -108,7 +115,7 @@ const parseScillaFile = async (fileName: string): Promise<ContractInfo | null> =
   let parsedContract;
   if (path.extname(fileName) === ".scillib") {
     parsedContract = await parseScillaLibrary(fileName);
-  }else {
+  } else {
     parsedContract = parseScilla(fileName);
   }
 

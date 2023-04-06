@@ -34,7 +34,9 @@ export class ZilliqaHardhatObject {
   }
 
   public async getBalance(a: Account): Promise<[BN, Number]> {
-    const rpc = await this.getZilliqaJSObject().blockchain.getBalance(a.address);
+    const rpc = await this.getZilliqaJSObject().blockchain.getBalance(
+      a.address
+    );
     if (rpc.error !== undefined) {
       if (rpc.error.code === -5) {
         // Account not created. Simulate it.

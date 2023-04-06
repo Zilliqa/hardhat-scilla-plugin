@@ -5,6 +5,7 @@ import {
   deploy,
   deployLibrary,
   ScillaContract,
+  UserDefinedLibrary,
 } from "./ScillaContractDeployer";
 import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
 import "./task-extensions";
@@ -33,7 +34,17 @@ extendEnvironment((hre) => {
       contractName: string,
       ...args: any[]
     ): Promise<ScillaContract> => {
-      return deploy(hre, contractName, ...args);
+      return deploy(hre, contractName, [], ...args);
+    }
+  );
+
+  hre.deployScillaWithLib = lazyFunction(
+    () => async (
+      contractName: string,
+      userDefinedLibraries: UserDefinedLibrary[],
+      ...args: any[]
+    ): Promise<ScillaContract> => {
+      return deploy(hre, contractName, userDefinedLibraries, ...args);
     }
   );
 

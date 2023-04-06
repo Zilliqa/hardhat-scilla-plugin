@@ -166,9 +166,17 @@ function handleUnnamedParam(param: Field, arg: any): Value {
   }
 }
 
+export interface UserDefinedLibrary {
+  name: string;
+  address: string;
+}
+
+type OptionalUserDefinedLibraryList = UserDefinedLibrary[] | null;
+
 export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
+  userDefinedLibraries: OptionalUserDefinedLibraryList,
   ...args: any[]
 ) {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
@@ -180,6 +188,7 @@ export async function deploy(
   let tx: Transaction;
   const init: Init = fillInit(
     contractName,
+    userDefinedLibraries,
     contractInfo.parsedContract.constructorParams,
     ...args
   );
@@ -282,10 +291,24 @@ const fillLibraryInit = (): Init => {
 
 const fillInit = (
   contractName: string,
+  userDefinedLibraries: OptionalUserDefinedLibraryList,
   contractParams: Fields | null,
   ...userSpecifiedArgs: any[]
 ): Init => {
   const init: Init = [{ vname: "_scilla_version", type: "Uint32", value: "0" }];
+
+  if (userDefinedLibraries) {
+    // Underlying zilliqa-js doesn't support push such an object to Init
+    (init as any).push({
+      vname: "_extlibs",
+      type: "List(Pair String ByStr20)",
+      value: userDefinedLibraries.map((lib) => ({
+        constructor: "Pair",
+        argtypes: ["String", "ByStr20"],
+        arguments: [lib.name, lib.address],
+      })),
+    });
+  }
 
   if (contractParams) {
     if (userSpecifiedArgs.length !== contractParams.length) {
