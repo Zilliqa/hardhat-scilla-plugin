@@ -1,10 +1,10 @@
 const parse: any = require("s-expression");
-import { HardhatPluginError } from "hardhat/plugins";
 import { execSync } from "child_process";
 import fs from "fs";
+import { HardhatPluginError } from "hardhat/plugins";
 
 export const isNumeric = (type: string | ADTField) => {
-  if (typeof type == "string"){
+  if (typeof type == "string") {
     switch (type) {
       case "Int64":
       case "Int128":
@@ -35,14 +35,14 @@ export interface Transition {
 }
 
 export interface Field {
-  typeJSON?: string | ADTField; //Type in JSON format.
+  typeJSON?: string | ADTField; // Type in JSON format.
   name: string;
   type: string;
 }
 
-export interface ADTField{
-  ctor: string
-  argtypes: Field[]
+export interface ADTField {
+  ctor: string;
+  argtypes: Field[];
 }
 
 export type Transitions = Transition[];
@@ -57,10 +57,10 @@ export interface ParsedContract {
   ctors: ScillaConstructor[];
 }
 
-export interface ScillaConstructor{
-  typename: string,
-  ctorname: string,
-  argtypes: string[],
+export interface ScillaConstructor {
+  typename: string;
+  ctorname: string;
+  argtypes: string[];
 }
 
 export const parseScilla = (filename: string): ParsedContract => {
@@ -70,12 +70,12 @@ export const parseScilla = (filename: string): ParsedContract => {
 
   const sexp = execSync(`scilla-fmt --sexp --human-readable ${filename}`);
   const result: any[] = parse(sexp.toString());
-  
+
   const libr = result.filter((row: string[]) => row[0] === "libs")[0][1];
   const contr = result.filter((row: string[]) => row[0] === "contr")[0][1];
 
-  const ctors = extractTypes(libr)
-  
+  const ctors = extractTypes(libr);
+
   const contractName = extractContractName(contr);
   const contractParams = extractContractParams(contr);
 
@@ -90,29 +90,29 @@ export const parseScilla = (filename: string): ParsedContract => {
     transitions,
     fields,
     constructorParams: contractParams,
-    ctors: ctors
+    ctors,
   };
 };
 
-const extractTypes = (lib:any) => {
-  let ctors:ScillaConstructor[] = [];
-  if (lib.length > 0){
+const extractTypes = (lib: any) => {
+  const ctors: ScillaConstructor[] = [];
+  if (lib.length > 0) {
     const lentries = lib[0][1][1];
-    for (var lentry of lentries){
-      switch(lentry[0]){
+    for (const lentry of lentries) {
+      switch (lentry[0]) {
         case "LibVar":
           break;
         case "LibTyp":
-          for (var typector of lentry[2]){
+          for (const typector of lentry[2]) {
             const typename = lentry[1][1][1];
-            const typectorname = typector[0][1][1][1]
+            const typectorname = typector[0][1][1][1];
             const typectorargtypes = typector[1][1].map(parseField);
 
             const userADT: ScillaConstructor = {
-              typename: typename,
+              typename,
               ctorname: typectorname,
-              argtypes: typectorargtypes
-            }
+              argtypes: typectorargtypes,
+            };
             ctors.push(userADT);
           }
           break;
@@ -120,7 +120,7 @@ const extractTypes = (lib:any) => {
     }
   }
   return ctors;
-}
+};
 
 const extractContractName = (contrElem: any[]): ContractName => {
   return contrElem
@@ -219,47 +219,50 @@ const extractTransitions = (ccompsElem: any[]): Transitions => {
   });
 };
 
-function parseField(row : any):Field{
+function parseField(row: any): Field {
   const field_type = row[0];
 
-  if (field_type == "PrimType"){
+  if (field_type == "PrimType") {
     const type = row[1];
     return {
       name: "",
       typeJSON: type,
-      type: type
-    }
-  } else if (field_type == "ADT"){
+      type,
+    };
+  } else if (field_type == "ADT") {
     const ctor = row[1][1][1];
     const argtypes = row[2].map(parseField);
     const name = row[0][1][1];
-    const ADT : ADTField = {
-      ctor: ctor,
-      argtypes: argtypes
-    }
+    const ADT: ADTField = {
+      ctor,
+      argtypes,
+    };
     return {
-      name: name,
+      name,
       typeJSON: ADT,
-      type: ctor + argtypes.map((arg: Field) => " " + arg.type).join(' ')
-    }
+      type: ctor + argtypes.map((arg: Field) => " " + arg.type).join(" "),
+    };
   } else {
-    throw new HardhatPluginError("hardhat-scilla-plugin", `Encountered unexpected field type ${row}`);
+    throw new HardhatPluginError(
+      "hardhat-scilla-plugin",
+      `Encountered unexpected field type ${row}`
+    );
   }
 }
 
-export function generateTypeConstructors(parsedCtors: ScillaConstructor[]){
-  var functions :{[Key:string]:any} = {};
-  for (var parsedCtor of parsedCtors){
+export function generateTypeConstructors(parsedCtors: ScillaConstructor[]) {
+  const functions: { [Key: string]: any } = {};
+  for (const parsedCtor of parsedCtors) {
     // We need to copy parsedCtor as it is placed in the closure of the function we are declaring so we do
     // not want it to be modified by the floor loop.
-    const ctorForClosure : ScillaConstructor = Object.create(parsedCtor);
-    functions[ctorForClosure.ctorname]= (args: any[]) => {
+    const ctorForClosure: ScillaConstructor = Object.create(parsedCtor);
+    functions[ctorForClosure.ctorname] = (args: any[]) => {
       // TODO: Add dynamic type checking.
-      return{
+      return {
         constructor: ctorForClosure.ctorname,
         argtypes: ctorForClosure.argtypes,
-        args: args
-      }
+        args,
+      };
     };
   }
   return functions;

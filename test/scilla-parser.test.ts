@@ -2,7 +2,11 @@ import { expect } from "chai";
 import chai from "chai";
 import chaiSubset from "chai-subset";
 
-import { ParsedContract, parseScilla, generateTypeConstructors } from "../src/ScillaParser";
+import {
+  generateTypeConstructors,
+  ParsedContract,
+  parseScilla,
+} from "../src/ScillaParser";
 chai.use(chaiSubset);
 
 describe("", function () {
@@ -33,7 +37,7 @@ describe("", function () {
 
     it("Should have correct transitions parameters for setHello", function () {
       expect(contract.transitions[0].params).to.deep.eq([
-        { type: "String", name: "msg" , typeJSON: "String"},
+        { type: "String", name: "msg", typeJSON: "String" },
       ]);
     });
 
@@ -45,23 +49,52 @@ describe("", function () {
 
     it("Should correctly parse user defined ADTs", function () {
       expect(adtContract.ctors).to.deep.eq([
-        {"typename":"SI","ctorname":"S","argtypes":[{"name":"","typeJSON":"String","type":"String"}]},
-        {"typename":"SI","ctorname":"I","argtypes":[{"name":"","typeJSON":"Uint32","type":"Uint32"}]},
-        {"typename":"SIPair","ctorname":"A","argtypes":[{"name":"","typeJSON":"Uint32","type":"Uint32"}]},
-        {"typename":"SIPair","ctorname":"B","argtypes":[{"name":"","typeJSON":"String","type":"String"}]},
-        {"typename":"SIPair","ctorname":"C",
-         "argtypes":[{"typeJSON":{"ctor":"SI","argtypes":[]},"type":"SI", name:undefined},
-                     {"typeJSON":{"ctor":"SI","argtypes":[]},"type":"SI", name:undefined}]}
+        {
+          typename: "SI",
+          ctorname: "S",
+          argtypes: [{ name: "", typeJSON: "String", type: "String" }],
+        },
+        {
+          typename: "SI",
+          ctorname: "I",
+          argtypes: [{ name: "", typeJSON: "Uint32", type: "Uint32" }],
+        },
+        {
+          typename: "SIPair",
+          ctorname: "A",
+          argtypes: [{ name: "", typeJSON: "Uint32", type: "Uint32" }],
+        },
+        {
+          typename: "SIPair",
+          ctorname: "B",
+          argtypes: [{ name: "", typeJSON: "String", type: "String" }],
+        },
+        {
+          typename: "SIPair",
+          ctorname: "C",
+          argtypes: [
+            {
+              typeJSON: { ctor: "SI", argtypes: [] },
+              type: "SI",
+              name: undefined,
+            },
+            {
+              typeJSON: { ctor: "SI", argtypes: [] },
+              type: "SI",
+              name: undefined,
+            },
+          ],
+        },
       ]);
     });
 
     it("Should return a constructor that generates a user defined ADT", function () {
       const constructors = generateTypeConstructors(adtContract.ctors);
       expect(constructors.A(1)).to.deep.eq({
-          constructor: 'A',
-          argtypes: [ { name: '', typeJSON: 'Uint32', type: 'Uint32' } ],
-          args: 1
-        });
+        constructor: "A",
+        argtypes: [{ name: "", typeJSON: "Uint32", type: "Uint32" }],
+        args: 1,
+      });
     });
   });
 });
