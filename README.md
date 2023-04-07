@@ -80,6 +80,12 @@ In the same way, you can deploy your libraries with their names:
 let library: ScillaContract = await hre.deployScillaLibrary("MyLibrary");
 ```
 
+and finally, here is how you can deploy a contract importing a user-defined library:
+```typescript
+contract2 = await hre.deployScillaWithLib("TestContract2",
+      [{name: "MutualLib", address: mutualLibAddress}]
+```
+
 ### Call a transition
 
 It's not harder than calling a normal function in typescript.
