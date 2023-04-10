@@ -43,7 +43,7 @@ export const updateContractsInfo = async () => {
       file in contractsInfo &&
       contractsInfo[file].hash === getFileHash(file)
     ) {
-      return; // Nothing to do
+      continue;
     }
 
     // Either the file is new or has been changed
