@@ -1,8 +1,8 @@
+import { BigNumber } from "@ethersproject/bignumber";
 import { expect } from "chai";
 import chai from "chai";
 
 import { simplifyLogs } from "../src/LogsSimplifier";
-import { BigNumber } from "@ethersproject/bignumber";
 
 describe("", function () {
   describe("Scilla Parser should parse contracts successfully", function () {
@@ -24,21 +24,19 @@ describe("", function () {
         },
       ];
       log = simplifyLogs(log);
-      expect(log[0].params[1].value).to.be.eq(12)
+      expect(log[0].params[1].value).to.be.eq(12);
     });
 
     it("Should simplify integer strings to a BigNumber for big ints", function () {
-      let log = [
+      const log = [
         {
           _eventname: "Emit",
           address: "0xb943f467a0159ee133618c1836a027ccecc62e28",
-          params: [
-            { type: "Uint128", value: "12", vname: "value" },
-          ],
+          params: [{ type: "Uint128", value: "12", vname: "value" }],
         },
       ];
-      let simpleLog = simplifyLogs(log);
-      let value: BigNumber = simpleLog[0].params[0].value;
+      const simpleLog = simplifyLogs(log);
+      const value: BigNumber = simpleLog[0].params[0].value;
       expect(value.eq(BigNumber.from("12"))).to.be.true;
     });
 
@@ -87,7 +85,7 @@ describe("", function () {
       log = simplifyLogs(log);
       expect(log[0].params[0].value).to.be.null;
     });
-  
+
     it("Should simplify Bool data type to true if it's True", function () {
       let log = [
         {
@@ -108,7 +106,7 @@ describe("", function () {
       ];
 
       log = simplifyLogs(log);
-      
+
       expect(log[0].params[0].value).to.be.true;
     });
 
