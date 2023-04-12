@@ -1,3 +1,4 @@
+import { BigNumber } from "@ethersproject/bignumber";
 import { Transaction } from "@zilliqa-js/account";
 import chai from "chai";
 import chaiSubset from "chai-subset";
@@ -7,7 +8,7 @@ chai.use(chaiSubset);
 
 export interface EventParam {
   type?: string;
-  value?: string;
+  value?: string | BigNumber | number;
   vname?: string;
 }
 
