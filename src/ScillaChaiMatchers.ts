@@ -1,6 +1,7 @@
 import { Transaction } from "@zilliqa-js/account";
 import chai from "chai";
 import chaiSubset from "chai-subset";
+import { simplifyLogs } from "./LogsSimplifier";
 chai.use(chaiSubset);
 
 export interface EventParam {
@@ -48,8 +49,8 @@ export const scillaChaiEventMatcher = function (
     const receipt = tx.getReceipt()!;
     new Assertion(this._obj).to.eventLog(eventName);
 
-    const event_logs = receipt.event_logs!;
-    const desiredLog = event_logs.filter((log) => log._eventname === eventName);
+    const event_logs = simplifyLogs(receipt.event_logs!);
+    const desiredLog = event_logs.filter((log: any) => log._eventname === eventName);
 
     new Assertion(desiredLog[0].params).to.containSubset(params);
   });
