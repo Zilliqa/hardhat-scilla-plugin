@@ -3,6 +3,8 @@
 // To extend one of Hardhat's types, you need to import the module where it has been defined, and redeclare it.
 import "hardhat/types/config";
 import "hardhat/types/runtime";
+import { Transaction } from "@zilliqa-js/account";
+import { Init} from "@zilliqa-js/contract";
 
 import { ScillaContract, UserDefinedLibrary } from "./ScillaContractDeployer";
 import { ScillaContracts } from "./ScillaContractsInfoUpdater";
@@ -12,16 +14,17 @@ import { ZilliqaHardhatObject } from "./ZilliqaHardhatObject";
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
     scillaContracts: ScillaContracts;
-    deployScilla: (
+    deployScillaContract: (
       contractName: string,
       ...args: any[]
     ) => Promise<ScillaContract>;
-    deployScillaWithLib: (
+    deployScillaContractWithLib: (
       contractName: string,
       userDefinedLibraries: UserDefinedLibrary[],
       ...args: any[]
     ) => Promise<ScillaContract>;
     deployScillaLibrary: (contractName: string) => Promise<ScillaContract>;
+    deployScillaFile: (contractName: string, init: Init) => Promise<[Transaction, ScillaContract]>;
     zilliqa: ZilliqaHardhatObject;
   }
 }

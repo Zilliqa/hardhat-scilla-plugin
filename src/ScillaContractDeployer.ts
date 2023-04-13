@@ -17,7 +17,6 @@ import {
   isNumeric,
   TransitionParam,
 } from "./ScillaParser";
-import { stringifyTransactionErrors } from "./ZilliqaUtils";
 
 interface Value {
   vname: string;
@@ -193,7 +192,7 @@ export async function deploy(
     ...args
   );
 
-  [tx, sc] = await deploy_from_file(contractInfo.path, init);
+  [tx, sc] = await deployFromFile(contractInfo.path, init);
   sc.deployed_by = tx;
   contractInfo.parsedContract.transitions.forEach((transition) => {
     sc[transition.name] = async (...args: any[]) => {
@@ -263,7 +262,7 @@ export const deployLibrary = async (
   let tx: Transaction;
   const init: Init = fillLibraryInit();
 
-  [tx, sc] = await deploy_from_file(contractInfo.path, init);
+  [tx, sc] = await deployFromFile(contractInfo.path, init);
   sc.deployed_by = tx;
 
   return sc;
@@ -335,7 +334,7 @@ const fillInit = (
 };
 
 // deploy a smart contract whose code is in a file with given init arguments
-async function deploy_from_file(
+export async function deployFromFile(
   path: string,
   init: Init
 ): Promise<[Transaction, ScillaContract]> {
@@ -355,12 +354,6 @@ async function deploy_from_file(
     false
   );
 
-  if (!sc.isDeployed()) {
-    const txnErrors = stringifyTransactionErrors(tx);
-    throw new HardhatPluginError(
-      `Scilla contract was not deployed - status ${sc.status} from ${tx.id}, errors: ${txnErrors}`
-    );
-  }
   return [tx, sc];
 }
 
