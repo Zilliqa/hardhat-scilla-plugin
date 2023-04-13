@@ -1,10 +1,10 @@
 // If your plugin extends types from another plugin, you should import the plugin here.
 
 // To extend one of Hardhat's types, you need to import the module where it has been defined, and redeclare it.
+import { Transaction } from "@zilliqa-js/account";
+import { Init } from "@zilliqa-js/contract";
 import "hardhat/types/config";
 import "hardhat/types/runtime";
-import { Transaction } from "@zilliqa-js/account";
-import { Init} from "@zilliqa-js/contract";
 
 import { ScillaContract, UserDefinedLibrary } from "./ScillaContractDeployer";
 import { ScillaContracts } from "./ScillaContractsInfoUpdater";
@@ -24,7 +24,10 @@ declare module "hardhat/types/runtime" {
       ...args: any[]
     ) => Promise<ScillaContract>;
     deployScillaLibrary: (contractName: string) => Promise<ScillaContract>;
-    deployScillaFile: (contractName: string, init: Init) => Promise<[Transaction, ScillaContract]>;
+    deployScillaFile: (
+      contractName: string,
+      init: Init
+    ) => Promise<[Transaction, ScillaContract]>;
     zilliqa: ZilliqaHardhatObject;
   }
 }

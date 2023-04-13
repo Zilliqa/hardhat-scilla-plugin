@@ -1,14 +1,14 @@
+import { Transaction } from "@zilliqa-js/account";
+import { Init } from "@zilliqa-js/contract";
 import { extendEnvironment } from "hardhat/config";
 import { lazyFunction, lazyObject } from "hardhat/plugins";
-import { Init} from "@zilliqa-js/contract";
-import { Transaction } from "@zilliqa-js/account";
 
 import {
   deploy,
+  deployFromFile,
   deployLibrary,
   ScillaContract,
   UserDefinedLibrary,
-  deployFromFile
 } from "./ScillaContractDeployer";
 import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
 import "./task-extensions";
@@ -22,7 +22,7 @@ export {
   Setup,
   initZilliqa,
   setAccount,
-  UserDefinedLibrary
+  UserDefinedLibrary,
 } from "./ScillaContractDeployer";
 
 export { scillaChaiEventMatcher } from "./ScillaChaiMatchers";
@@ -59,7 +59,10 @@ extendEnvironment((hre) => {
   );
 
   hre.deployScillaFile = lazyFunction(
-    () => async (contractPath: string, init: Init): Promise<[Transaction, ScillaContract]> => {
+    () => async (
+      contractPath: string,
+      init: Init
+    ): Promise<[Transaction, ScillaContract]> => {
       return deployFromFile(contractPath, init);
     }
   );
