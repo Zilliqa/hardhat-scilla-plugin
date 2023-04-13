@@ -158,6 +158,12 @@ But if you just want to expect on the value of a event parameter do this:
 expect(tx).to.have.eventLogWithParams("getHello()", {value: "hello world"});
 ```
 
+For easier value matching, some value conversions are done under the hood.
+* 32/64 bit integer values are converted to `Number`
+* 128/256 bit integer values are converted to `BigNumber`
+* `Option` is converted to its inner value if exists any, or `null` otherwise.
+* `Bool` is converted to underlying boolean value.
+ 
 for more tests please take look at [scilla tests](https://github.com/Zilliqa/Zilliqa/tree/master/tests/EvmAcceptanceTests/test/scilla).
 
 ### TODO
