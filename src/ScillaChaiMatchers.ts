@@ -8,7 +8,7 @@ chai.use(chaiSubset);
 
 export interface EventParam {
   type?: string;
-  value?: string | BigNumber | number;
+  value?: string | BigNumber | number | boolean;
   vname?: string;
 }
 
