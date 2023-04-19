@@ -1,8 +1,7 @@
 // This is necessary so that tsc can resolve some of the indirect types for
 // sc_call, otherwise it errors out - richard@zilliqa.com 2023-03-09
-import { Transaction, TxParams } from "@zilliqa-js/account";
-import { Account } from "@zilliqa-js/account";
-import { Contract, Init, State, CallParams } from "@zilliqa-js/contract";
+import { Account, Transaction } from "@zilliqa-js/account";
+import { CallParams, Contract, Init, State } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import fs from "fs";
@@ -95,12 +94,12 @@ export class ScillaContract extends Contract {
 }
 
 function handleParam(param: Field, arg: any): Value {
-  if (typeof param.typeJSON == "undefined") {
+  if (typeof param.typeJSON === "undefined") {
     throw new HardhatPluginError(
       "hardhat-scilla-plugin",
       "Parameters were incorrectly parsed. Try clearing your scilla.cache file."
     );
-  } else if (typeof param.typeJSON == "string") {
+  } else if (typeof param.typeJSON === "string") {
     return {
       vname: param.name,
       type: param.type,
@@ -134,12 +133,12 @@ function handleParam(param: Field, arg: any): Value {
 }
 
 function handleUnnamedParam(param: Field, arg: any): Value {
-  if (typeof param.typeJSON == "undefined") {
+  if (typeof param.typeJSON === "undefined") {
     throw new HardhatPluginError(
       "hardhat-scilla-plugin",
       "Parameters were incorrectly parsed. Try clearing your scilla.cache file."
     );
-  } else if (typeof param.typeJSON == "string") {
+  } else if (typeof param.typeJSON === "string") {
     return arg.toString();
   } else {
     const values: Value[] = [];
@@ -200,13 +199,13 @@ export async function deploy(
         version: setup!.version,
         gasPrice: setup!.gasPrice,
         gasLimit: setup!.gasLimit,
-        amount: new BN(0)
+        amount: new BN(0),
       };
 
       if (args.length === transition.params.length + 1) {
         // The last param is Tx info such as amount
         const txParams = args.pop();
-        callParams = {...callParams, ...txParams}
+        callParams = { ...callParams, ...txParams };
       } else if (args.length !== transition.params.length) {
         throw new Error(
           `Expected to receive ${transition.params.length} parameters for ${transition.name} but got ${args.length}`

@@ -1,8 +1,5 @@
-import { BN, bytes, Long, units } from "@zilliqa-js/util";
+import { BN } from "@zilliqa-js/util";
 import { expect } from "chai";
-import chai from "chai";
-import chaiSubset from "chai-subset";
-import { existsSync, rmSync } from "fs";
 
 import { initZilliqa } from "../src/ScillaContractDeployer";
 import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
