@@ -1,8 +1,7 @@
 // This is necessary so that tsc can resolve some of the indirect types for
 // sc_call, otherwise it errors out - richard@zilliqa.com 2023-03-09
-import { Transaction } from "@zilliqa-js/account";
-import { Account } from "@zilliqa-js/account";
-import { Contract, Init, State } from "@zilliqa-js/contract";
+import { Account, Transaction } from "@zilliqa-js/account";
+import { CallParams, Contract, Init, State } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import fs from "fs";
@@ -95,12 +94,12 @@ export class ScillaContract extends Contract {
 }
 
 function handleParam(param: Field, arg: any): Value {
-  if (typeof param.typeJSON == "undefined") {
+  if (typeof param.typeJSON === "undefined") {
     throw new HardhatPluginError(
       "hardhat-scilla-plugin",
       "Parameters were incorrectly parsed. Try clearing your scilla.cache file."
     );
-  } else if (typeof param.typeJSON == "string") {
+  } else if (typeof param.typeJSON === "string") {
     return {
       vname: param.name,
       type: param.type,
@@ -134,12 +133,12 @@ function handleParam(param: Field, arg: any): Value {
 }
 
 function handleUnnamedParam(param: Field, arg: any): Value {
-  if (typeof param.typeJSON == "undefined") {
+  if (typeof param.typeJSON === "undefined") {
     throw new HardhatPluginError(
       "hardhat-scilla-plugin",
       "Parameters were incorrectly parsed. Try clearing your scilla.cache file."
     );
-  } else if (typeof param.typeJSON == "string") {
+  } else if (typeof param.typeJSON === "string") {
     return arg.toString();
   } else {
     const values: Value[] = [];
@@ -196,11 +195,17 @@ export async function deploy(
   sc.deployed_by = tx;
   contractInfo.parsedContract.transitions.forEach((transition) => {
     sc[transition.name] = async (...args: any[]) => {
-      let amount = 0;
+      let callParams: CallParams = {
+        version: setup!.version,
+        gasPrice: setup!.gasPrice,
+        gasLimit: setup!.gasLimit,
+        amount: new BN(0),
+      };
+
       if (args.length === transition.params.length + 1) {
         // The last param is Tx info such as amount
         const txParams = args.pop();
-        amount = txParams.amount ?? 0;
+        callParams = { ...callParams, ...txParams };
       } else if (args.length !== transition.params.length) {
         throw new Error(
           `Expected to receive ${transition.params.length} parameters for ${transition.name} but got ${args.length}`
@@ -212,7 +217,7 @@ export async function deploy(
         values.push(handleParam(param, args[index]));
       });
 
-      return sc_call(sc, transition.name, values, new BN(amount));
+      return sc_call(sc, transition.name, values, callParams);
     };
   });
 
@@ -362,8 +367,7 @@ export async function sc_call(
   sc: Contract,
   transition: string,
   args: Value[] = [],
-  amt = new BN(0)
-  // caller_pub_key = setup.pub_keys[0]
+  callParams: CallParams
 ) {
   if (setup === null) {
     throw new HardhatPluginError(
@@ -375,13 +379,7 @@ export async function sc_call(
   return sc.call(
     transition,
     args,
-    {
-      version: setup.version,
-      amount: amt,
-      gasPrice: setup.gasPrice,
-      gasLimit: setup.gasLimit,
-      // pubKey: caller_pub_key
-    },
+    callParams,
     setup.attempts,
     setup.timeout,
     true

@@ -1,11 +1,10 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { expect } from "chai";
-import chai from "chai";
 
 import { simplifyLogs } from "../src/LogsSimplifier";
 
 describe("", function () {
-  describe("Scilla Parser should parse contracts successfully", function () {
+  describe("Logs simplifier", function () {
     before(function () {});
 
     it("Should simplify integer strings to an integer for 32/64 bit ints", function () {

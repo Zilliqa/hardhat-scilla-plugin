@@ -95,6 +95,32 @@ Let's assume we have a transition named `Set` which accepts a `number` as its pa
 await contract.Set(12);
 ```
 
+### Call a transition with a custom nonce
+```typescript
+await contract.Set(12, {nonce: 12});
+```
+It's possible to override the following properties:
+
+```typescript
+export interface TxParams {
+    version: number;
+    toAddr: string;
+    amount: BN;
+    gasPrice: BN;
+    gasLimit: Long;
+    code?: string;
+    data?: string;
+    receipt?: TxReceipt;
+    nonce?: number;
+    pubKey?: string;
+    signature?: string;
+}
+```
+
+```typescript
+await contract.Set(12, {nonce: 12, amount: new BN(1000)});
+```
+
 ### Get field value
 
 If a given contract has a filed named `msg` is possible to get its current value using a function call to `msg()`

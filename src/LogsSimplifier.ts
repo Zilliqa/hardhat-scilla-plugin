@@ -26,9 +26,8 @@ const simplifyNumber = function (type: string, n: string) {
       return Number(n);
     case "Uint128":
     case "Int128":
-    case "Int256":
-    case "Uint128":
     case "Uint256":
+    case "Int256":
       return BigNumber.from(n);
 
     default:

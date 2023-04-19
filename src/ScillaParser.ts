@@ -5,7 +5,7 @@ import { HardhatPluginError } from "hardhat/plugins";
 const readline = require("readline");
 
 export const isNumeric = (type: string | ADTField) => {
-  if (typeof type == "string") {
+  if (typeof type === "string") {
     switch (type) {
       case "Int64":
       case "Int128":
@@ -254,14 +254,14 @@ const extractTransitions = (ccompsElem: any[]): Transitions => {
 function parseField(row: any): Field {
   const field_type = row[0];
 
-  if (field_type == "PrimType") {
+  if (field_type === "PrimType") {
     const type = row[1];
     return {
       name: "",
       typeJSON: type,
       type,
     };
-  } else if (field_type == "ADT") {
+  } else if (field_type === "ADT") {
     const ctor = row[1][1][1];
     const argtypes = row[2].map(parseField);
     const name = row[0][1][1];
