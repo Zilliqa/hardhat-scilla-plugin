@@ -275,7 +275,7 @@ function parseField(row: any): Field {
       type: ctor + argtypes.map((arg: Field) => " " + arg.type).join(" "),
     };
   } else if (field_type === "Address") {
-    const type = row[1];
+    const type = "ByStr20";
     return {
       name: "",
       typeJSON: type,

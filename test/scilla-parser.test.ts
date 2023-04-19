@@ -97,9 +97,9 @@ describe("", function () {
       });
     });
 
-    it("should parse _codehash addresses", async () => {
+    it("should parse _codehash address type as ByStr20", async () => {
       const ecdsa = parseScilla("contracts/Codehash.scilla");
-      expect(ecdsa.transitions[0].params[0].type).to.be.eq("CodeAddr");
+      expect(ecdsa.transitions[0].params[0].type).to.be.eq("ByStr20");
     });
   });
 
