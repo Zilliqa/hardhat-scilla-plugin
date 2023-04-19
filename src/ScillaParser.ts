@@ -274,6 +274,13 @@ function parseField(row: any): Field {
       typeJSON: ADT,
       type: ctor + argtypes.map((arg: Field) => " " + arg.type).join(" "),
     };
+  } else if (field_type === "Address") {
+    const type = "ByStr20";
+    return {
+      name: "",
+      typeJSON: type,
+      type,
+    };
   } else {
     throw new HardhatPluginError(
       "hardhat-scilla-plugin",
