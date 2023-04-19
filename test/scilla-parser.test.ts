@@ -96,6 +96,11 @@ describe("", function () {
         args: 1,
       });
     });
+
+    it("should parse _codehash addresses",async () => {
+      let ecdsa = parseScilla("contracts/Codehash.scilla");
+      expect(ecdsa.transitions[0].params[0].type).to.be.eq("CodeAddr")     
+    })
   });
 
   describe("Scilla Parser should parse libraries successfully", function () {
