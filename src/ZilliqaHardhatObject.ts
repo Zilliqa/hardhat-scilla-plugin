@@ -73,9 +73,9 @@ export class ZilliqaHardhatObject {
     return this.getBalanceForAddress(account.address);
   }
 
-  public async getBalanceForAddress(a: string): Promise<[BN, Number]> {
+  public async getBalanceForAddress(addressToQuery: string): Promise<[BN, Number]> {
     const rpc = await this.getZilliqaJSObject().blockchain.getBalance(
-      a
+      addressToQuery
     );
     if (rpc.error !== undefined) {
       if (rpc.error.code === -5) {

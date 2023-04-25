@@ -87,7 +87,7 @@ extendEnvironment((hre) => {
     () => (): string[] => {
       return (hre as any).network.config.accounts;
     });
-  hre.setAccount = lazyFunction(
+  hre.setActiveAccount = lazyFunction(
     () => (num: number) : void => {
       setAccount(num);
     });
