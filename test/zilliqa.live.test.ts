@@ -1,35 +1,55 @@
 import { BN } from "@zilliqa-js/util";
 import { expect } from "chai";
 
-import { initZilliqa } from "../src/ScillaContractDeployer";
 import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { useEnvironment } from "./helpers"
 
 describe("", function () {
-  let zobj: ZilliqaHardhatObject.ZilliqaHardhatObject;
 
-  before(async function () {
-    // const privateKeys = [ "d7ebc171562928a59aa8423e9b69393fe43a32f34b25dddc04f3f0dfe8881479" ];
-    const privateKeys = [
-      "603f0ef1610a638bb28d8f61ed7956c701e114fa39e1c263fc4f5504aed2f211",
-    ];
-    // const network_url = "http://localhost:8082";
-    const network_url =
-      process.env.ZILLIQA_API_URL || "https://dev-api.zilliqa.com";
-    const chain_id = 333;
+  var hre : HardhatRuntimeEnvironment;
+  var zobj : ZilliqaHardhatObject.ZilliqaHardhatObject;
 
-    await initZilliqa(network_url, chain_id, privateKeys);
-    zobj = new ZilliqaHardhatObject.ZilliqaHardhatObject();
-  });
-
+  useEnvironment("hardhat-project");
+  this.timeout(500000);
   describe("Zilliqa network APIs", function () {
-    // I happen to know that this account exists - rrw 2023-03-12
-    it("Should be able to fetch a balance", async function () {
-      const account = zobj.getAccounts()[0];
-      const [bal, nonce] = await zobj.getBalance(account);
+    // Try an account that (hopefully) doesn't exist.
+    it("Should be able to fetch a balance from a nonexistent account", async function () {
+      const privKey = this.zobj.createPrivateKey();
+      const [ acc, idx ] = this.zobj.pushPrivateKey(privKey);
+      this.hre.setActiveAccount(idx);
+      const [bal, nonce] = await this.zobj.getBalance(acc);
       expect(bal).to.exist;
       expect(bal.eq(new BN("0", 10))).to.be.true;
       expect(nonce).to.be.eq(-1);
-      // console.log(`Done ${bal}, ${nonce}`)
+      this.hre.setActiveAccount(0);
+    });
+
+    it("Should be able to fetch a balance from the default account", async function () {
+      const account = this.zobj.getAccounts()[0];
+      const [bal, nonce] = await this.zobj.getBalance(account);
+      expect(bal).to.exist;
+      expect(nonce).to.not.be.eq(-1);
+    });
+
+    it("Should be able to transfer ZIL between accounts", async function () {
+      this.hre.setActiveAccount(0);
+      const privKey = this.zobj.createPrivateKey();
+      const [acc,idx] = this.zobj.pushPrivateKey(privKey);
+      const VAL = new BN(100000002000000);
+      const txn = await this.zobj.transferTo(acc, new BN(VAL));
+      const [bal,nonce] = await this.zobj.getBalance(acc);
+      const transferredBalance = bal;
+      expect(bal).to.exist;
+      expect(bal.eq(new BN(VAL))).to.be.true;
+      expect(nonce).to.not.be.eq(-1);
+      // Now transfer it back.
+      this.hre.setActiveAccount(idx);
+      // Lose 10 zil here for gas.
+      // console.log(`Transferredbalance ${transferredBalance}`);
+      const txn2 = await this.zobj.transferToAddress(this.zobj.getAccounts()[0].address, new BN(1_000));
+      expect(txn2['receipt']['success']).to.be.true;
+      this.hre.setActiveAccount(0);
     });
   });
 });

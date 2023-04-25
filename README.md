@@ -216,7 +216,15 @@ npx hardhat scilla-check --libdir path_to_stdlib contracts/scilla/helloWorld.sci
 
 ### Running internal tests
 
-Set `ZILLIQA_API_URL` to the URL of a network to test, or we'll use testnet by default.
+If you want to monitor your requests:
+
+```
+mitmweb --mode reverse:https://dev-api.zilliqa.com --modify-headers /~q/Host/dev-api.zilliqa.com --no-web-open-browser --listen-port 5600 --web-port 8600
+export ZILLIQA_API_URL=http://localhost:5600/
+```
+
+Set `ZILLIQA_API_URL` to the URL of a network to test - or to eg. `http://localhost:5600` if you're proxying as above.
+Set `ZILLIQA_NETWORK` to the name of the network to test against - see `test/fixture-projects/hardhat-proxy/hardhat.config.ts` for details.
 
 ```sh
 yarn test
