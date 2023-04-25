@@ -29,5 +29,9 @@ declare module "hardhat/types/runtime" {
       init: Init
     ) => Promise<[Transaction, ScillaContract]>;
     zilliqa: ZilliqaHardhatObject;
+    getZilliqaChainId: () => number;
+    getNetworkUrl: () => string;
+    getPrivateKeys: () => string[];
+    setAccount: (num: number) => void;
   }
 }

@@ -1,5 +1,5 @@
-import { Account, Transaction, Wallet } from "@zilliqa-js/account";
-import * as zcyrpto from "@zilliqa-js/crypto";
+import { Account, Transaction, TxParams, Wallet } from "@zilliqa-js/account";
+import * as zcrypto from "@zilliqa-js/crypto";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import { HardhatPluginError } from "hardhat/plugins";
@@ -28,14 +28,54 @@ export class ZilliqaHardhatObject {
     return this.getZilliqaSetup().accounts;
   }
 
+  /** Push a private key onto the accounts array, returning a pair of the
+   * account and the index at which it can be found
+   */
+  public pushPrivateKey(privKey: string) : [ Account, number ] {
+    const account = new Account(privKey);
+    const val = this.getZilliqaSetup().accounts.push(account)-1;
+    this.getZilliqaJSObject().wallet.addByPrivateKey(privKey);
+    return [ account, val ];
+  }
+  
   public createPrivateKey() {
-    const privateKey = zcyrpto.schnorr.generatePrivateKey();
+    const privateKey = zcrypto.schnorr.generatePrivateKey();
     return privateKey;
   }
 
-  public async getBalance(a: Account): Promise<[BN, Number]> {
+  public async transferTo(toAccount: Account, value: BN,
+                        txParams = { }): Promise<Transaction> {
+    return this.transferToAddress(toAccount.address, value, txParams);
+  }
+  
+  public async transferToAddress(toAddress: string, value: BN,
+                        txParams = { }) : Promise<Transaction> {
+    const setup = this.getZilliqaSetup();
+    const zjs = this.getZilliqaJSObject();
+    // Forcibly checksum the address, since otherwise we will get into a mess
+    // because eth addresses are checksummed differently from zil.
+    const flat = toAddress.toLowerCase();
+    const summed = zcrypto.toChecksumAddress(flat);
+    const txDefault : TxParams = {
+      version : setup.version,
+      gasPrice: setup.gasPrice,
+      gasLimit: setup.gasLimit,
+      amount: value,
+      toAddr: summed,
+    };
+    const callParams =  { ...txDefault, ...txParams };
+    const tx1 = zjs.transactions.new(callParams);
+    const tx = zjs.blockchain.createTransaction(tx1, setup!.attempts, setup!.timeout)
+    return tx
+  }
+
+  public async getBalance(account: Account): Promise<[BN, Number]> {
+    return this.getBalanceForAddress(account.address);
+  }
+
+  public async getBalanceForAddress(a: string): Promise<[BN, Number]> {
     const rpc = await this.getZilliqaJSObject().blockchain.getBalance(
-      a.address
+      a
     );
     if (rpc.error !== undefined) {
       if (rpc.error.code === -5) {

@@ -9,6 +9,7 @@ import {
   deployLibrary,
   ScillaContract,
   UserDefinedLibrary,
+  setAccount
 } from "./ScillaContractDeployer";
 import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
 import "./task-extensions";
@@ -24,6 +25,12 @@ export {
   setAccount,
   UserDefinedLibrary,
 } from "./ScillaContractDeployer";
+export {
+  ZilliqaHardhatObject
+} from "./ZilliqaHardhatObject";
+export {
+  BN
+} from "@zilliqa-js/util";
 
 export { scillaChaiEventMatcher } from "./ScillaChaiMatchers";
 
@@ -68,4 +75,20 @@ extendEnvironment((hre) => {
   );
 
   hre.zilliqa = lazyObject(() => loadZilliqaHardhatObject(hre));
+  hre.getZilliqaChainId = lazyFunction(
+    () => (): number => {
+      return (hre as any).network.config.chainId! & 0x7fff;
+    });
+  hre.getNetworkUrl = lazyFunction(
+    () => (): string =>  {
+      return (hre as any).network.config.url;
+    });
+  hre.getPrivateKeys = lazyFunction(
+    () => (): string[] => {
+      return (hre as any).network.config.accounts;
+    });
+  hre.setAccount = lazyFunction(
+    () => (num: number) : void => {
+      setAccount(num);
+    });
 });

@@ -47,3 +47,4 @@ export async function getEventLog(tx: Transaction): Promise<any> {
   const event_logs = receipt.event_logs!;
   return event_logs;
 }
+
