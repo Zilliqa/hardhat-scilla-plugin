@@ -176,28 +176,6 @@ export async function deploy(
   contractName: string,
   userDefinedLibraries: OptionalUserDefinedLibraryList,
   ...args: any[]) {
-  if (setup === null) {
-    throw new HardhatPluginError(
-      "hardhat-scilla-plugin",
-      "Please call initZilliqa function."
-    );
-  }
-  const account = setup.zilliqa.wallet.defaultAccount!;
-  return deployWithAccount(
-    hre,
-    contractName,
-    userDefinedLibraries,
-    account,
-    ...args)
-}
-
-export async function deployWithAccount(
-  hre: HardhatRuntimeEnvironment,
-  contractName: string,
-  userDefinedLibraries: OptionalUserDefinedLibraryList,
-  account: Account,
-  ...args: any[]
-) {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
   if (contractInfo === undefined) {
     throw new Error(`Scilla contract ${contractName} doesn't exist.`);
