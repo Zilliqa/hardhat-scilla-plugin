@@ -1,7 +1,7 @@
 // If your plugin extends types from another plugin, you should import the plugin here.
 
 // To extend one of Hardhat's types, you need to import the module where it has been defined, and redeclare it.
-import { Transaction } from "@zilliqa-js/account";
+import { Account, Transaction } from "@zilliqa-js/account";
 import { Init } from "@zilliqa-js/contract";
 import "hardhat/types/config";
 import "hardhat/types/runtime";
@@ -32,6 +32,6 @@ declare module "hardhat/types/runtime" {
     getZilliqaChainId: () => number;
     getNetworkUrl: () => string;
     getPrivateKeys: () => string[];
-    setActiveAccount: (num: number) => void;
+    setActiveAccount: (account: Account) => void;
   }
 }

@@ -76,14 +76,14 @@ function read(f: string) {
   return t;
 }
 
-export function setAccount(accountNumber: number) {
+export function setAccount(account: Account) {
   if (setup === null) {
     throw new HardhatPluginError(
       "hardhat-scilla-plugin",
       "Please call initZilliqa function."
     );
   }
-  setup.zilliqa.wallet.defaultAccount = setup.accounts[accountNumber];
+  setup.zilliqa.wallet.defaultAccount = account;
 }
 
 export type ContractFunction<T = any> = (...args: any[]) => Promise<T>;
@@ -175,6 +175,27 @@ export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
   userDefinedLibraries: OptionalUserDefinedLibraryList,
+  ...args: any[]) {
+  if (setup === null) {
+    throw new HardhatPluginError(
+      "hardhat-scilla-plugin",
+      "Please call initZilliqa function."
+    );
+  }
+  const account = setup.zilliqa.wallet.defaultAccount!;
+  return deployWithAccount(
+    hre,
+    contractName,
+    userDefinedLibraries,
+    account,
+    ...args)
+}
+
+export async function deployWithAccount(
+  hre: HardhatRuntimeEnvironment,
+  contractName: string,
+  userDefinedLibraries: OptionalUserDefinedLibraryList,
+  account: Account,
   ...args: any[]
 ) {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
@@ -193,6 +214,17 @@ export async function deploy(
 
   [tx, sc] = await deployFromFile(contractInfo.path, init);
   sc.deployed_by = tx;
+
+  // We set three special fields ctors, connect and account.
+  // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
+  const parsedCtors = contractInfo.parsedContract.ctors;
+  sc.ctors = generateTypeConstructors(parsedCtors);
+  sc.account = null;
+  sc.connect = (account : Account) => {
+    sc.account = account;
+    return sc;
+  }
+
   contractInfo.parsedContract.transitions.forEach((transition) => {
     sc[transition.name] = async (...args: any[]) => {
       let callParams: CallParams = {
@@ -217,7 +249,7 @@ export async function deploy(
         values.push(handleParam(param, args[index]));
       });
 
-      return sc_call(sc, transition.name, values, callParams);
+      return await sc_call(sc, transition.name, values, new BN(0), sc.account);
     };
   });
 
@@ -246,10 +278,6 @@ export async function deploy(
       };
     });
   }
-
-  // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
-  const parsedCtors = contractInfo.parsedContract.ctors;
-  sc.ctors = generateTypeConstructors(parsedCtors);
 
   return sc;
 }
@@ -367,7 +395,8 @@ export async function sc_call(
   sc: Contract,
   transition: string,
   args: Value[] = [],
-  callParams: CallParams
+  amt = new BN(0),
+  account?: Account
 ) {
   if (setup === null) {
     throw new HardhatPluginError(
@@ -376,12 +405,20 @@ export async function sc_call(
     );
   }
 
+  var params : CallParams = {
+    version: setup.version,
+    amount: amt,
+    gasPrice: setup.gasPrice,
+    gasLimit: setup.gasLimit,
+    pubKey: account?.publicKey
+  };
+
   return sc.call(
     transition,
     args,
-    callParams,
+    params,
     setup.attempts,
     setup.timeout,
     true
-  );
+);
 }

@@ -1,4 +1,4 @@
-import { Transaction } from "@zilliqa-js/account";
+import { Account, Transaction } from "@zilliqa-js/account";
 import { Init } from "@zilliqa-js/contract";
 import { extendEnvironment } from "hardhat/config";
 import { lazyFunction, lazyObject } from "hardhat/plugins";
@@ -22,7 +22,6 @@ export {
   ScillaContract,
   Setup,
   initZilliqa,
-  setAccount,
   UserDefinedLibrary,
 } from "./ScillaContractDeployer";
 export {
@@ -88,7 +87,7 @@ extendEnvironment((hre) => {
       return (hre as any).network.config.accounts;
     });
   hre.setActiveAccount = lazyFunction(
-    () => (num: number) : void => {
-      setAccount(num);
+    () => (account: Account) : void => {
+      setAccount(account);
     });
 });
