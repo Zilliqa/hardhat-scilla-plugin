@@ -1,6 +1,7 @@
 const parse: any = require("s-expression");
 import { execSync } from "child_process";
 import fs from "fs";
+import path from "path";
 import { HardhatPluginError } from "hardhat/plugins";
 const readline = require("readline");
 
@@ -96,11 +97,17 @@ export const parseScillaLibrary = async (
 };
 
 export const parseScilla = (filename: string): ParsedContract => {
-  if (!fs.existsSync(filename)) {
-    throw new Error(`${filename} doesn't exist.`);
+  const resolvedFilename = path.resolve(filename)
+  if (!fs.existsSync(resolvedFilename)) {
+    throw new Error(`${resolvedFilename} doesn't exist.`);
   }
 
-  const sexp = execSync(`scilla-fmt --sexp --human-readable ${filename}`);
+  let sexp = undefined;
+  if (process.env.USE_NATIVE_SCILLA !== undefined) {
+     sexp = execSync(`scilla-fmt --sexp --human-readable ${filename}`);
+  } else {
+     sexp = execSync(`docker run --rm -v ${resolvedFilename}:/tmp/input.scilla -i zilliqa/scilla:v0.13.3 /scilla/0/bin/scilla-fmt --sexp --human-readable /tmp/input.scilla`);
+  }
   const result: any[] = parse(sexp.toString());
 
   const libr = result.filter((row: string[]) => row[0] === "libs")[0][1];

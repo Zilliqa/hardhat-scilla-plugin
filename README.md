@@ -28,7 +28,16 @@ Or if you are using TypeScript, in your `hardhat.config.ts`:
 import "hardhat-scilla-plugin";
 ```
 
+
+
+## Running Scilla
+
 You need to have `scilla-fmt` binary from the [Scilla project](https://github.com/Zilliqa/scilla/). It's used to parse scilla contracts and to provide better user experience while working with the plugin.
+
+If you want to use the `scilla-checker` task you will also need the `scilla-checker` binary.
+
+By default, we pull these from the `zilliqa/scilla` container in docker hub, using Scilla v0.13.3, but if you want to run them from your local machine, you can set the `USE_NATIVE_SCILLA` environment variable to run them from your `PATH`. If want to run `scilla-checker` with `USE_NATIVE_SCILLA` set, you will need to give the `-libDir` argument to tell it where to find the Scilla standard library.
+
 ## Tasks
 
 This plugin adds the _scilla-check_ task to Hardhat:
