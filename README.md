@@ -13,7 +13,7 @@ This plugin is used to test scilla contracts in hardhat. It tries to be like eth
 ## Installation
 
 ```bash
-npm install hardhat-scilla-plugin
+pnpm install hardhat-scilla-plugin
 ```
 
 Import the plugin in your `hardhat.config.js`:
@@ -33,7 +33,7 @@ You need to have `scilla-fmt` binary from the [Scilla project](https://github.co
 
 This plugin adds the _scilla-check_ task to Hardhat:
 ```
-Hardhat version 2.11.2
+Hardhat version 2.16.0
 
 Usage: hardhat [GLOBAL OPTIONS] scilla-check --libdir <STRING> [...contracts]
 
