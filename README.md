@@ -32,11 +32,11 @@ import "hardhat-scilla-plugin";
 
 ## Running Scilla
 
-You need to have `scilla-fmt` binary from the [Scilla project](https://github.com/Zilliqa/scilla/). It's used to parse scilla contracts and to provide better user experience while working with the plugin.
-
-If you want to use the `scilla-checker` task you will also need the `scilla-checker` binary.
+In order to check, and extract data from, Scilla contracts, we use binaries from the Scilla distribution itself.
 
 By default, we pull these from the `zilliqa/scilla` container in docker hub, using Scilla v0.13.3, but if you want to run them from your local machine, you can set the `USE_NATIVE_SCILLA` environment variable to run them from your `PATH`. If want to run `scilla-checker` with `USE_NATIVE_SCILLA` set, you will need to give the `-libDir` argument to tell it where to find the Scilla standard library.
+
+If you want to set `USE_NATIVE_SCILLA`, you need to have `scilla-fmt` and `scilla-checker` binaries from the [Scilla project](https://github.com/Zilliqa/scilla/) on your `PATH`. You can build them by following the instructions in the scilla project repository.
 
 ## Tasks
 

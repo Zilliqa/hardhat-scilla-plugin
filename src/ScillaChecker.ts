@@ -2,6 +2,7 @@ import { execSync } from "child_process";
 import clc from "cli-color";
 import { glob } from "glob";
 import path from "path";
+import * as ZilliqaUtils from "./ZilliqaUtils";
 
 export async function runScillaChecker(contracts: any, libdir: any) {
   let files: string[] = [];
@@ -18,7 +19,7 @@ export async function runScillaChecker(contracts: any, libdir: any) {
     try {
       console.log(clc.greenBright.bold(`🔍Checking ${file}...`));
       let value = undefined;
-      if (process.env.USE_NATIVE_SCILLA) {
+      if (ZilliqaUtils.useNativeScilla()) {
         value = execSync(
           `scilla-checker -gaslimit 10000 -libdir ${libdir} ${file}`
         );

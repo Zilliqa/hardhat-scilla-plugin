@@ -1,5 +1,6 @@
 const parse: any = require("s-expression");
 import { execSync } from "child_process";
+import * as ZilliqaUtils from "./ZilliqaUtils";
 import fs from "fs";
 import path from "path";
 import { HardhatPluginError } from "hardhat/plugins";
@@ -103,7 +104,7 @@ export const parseScilla = (filename: string): ParsedContract => {
   }
 
   let sexp = undefined;
-  if (process.env.USE_NATIVE_SCILLA !== undefined) {
+  if (ZilliqaUtils.useNativeScilla()) {
      sexp = execSync(`scilla-fmt --sexp --human-readable ${filename}`);
   } else {
      sexp = execSync(`docker run --rm -v ${resolvedFilename}:/tmp/input.scilla -i zilliqa/scilla:v0.13.3 /scilla/0/bin/scilla-fmt --sexp --human-readable /tmp/input.scilla`);
