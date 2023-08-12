@@ -10,6 +10,7 @@ jobs:
   build:
     strategy:
       fail-fast: false
+      pnpm_version: 8
       matrix:
         node_version: [18]
 
@@ -26,7 +27,7 @@ jobs:
 
     - uses: pnpm/action-setup@v2
       with:
-        version: ${{matrix.node_version}}.x
+        version: ${{pnpm_version}}
         run_install: false
 
     - name: Get pnpm store directory
