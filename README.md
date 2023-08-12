@@ -28,8 +28,6 @@ Or if you are using TypeScript, in your `hardhat.config.ts`:
 import "hardhat-scilla-plugin";
 ```
 
-
-
 ## Running Scilla
 
 In order to check, and extract data from, Scilla contracts, we use binaries from the Scilla distribution itself.
