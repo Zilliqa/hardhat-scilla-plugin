@@ -4,7 +4,7 @@ import { glob } from "glob";
 import { task } from "hardhat/config";
 
 import { updateContractsInfo as updateScillaContractsInfo } from "./ScillaContractsInfoUpdater";
-import { runScillaChecker } from "./ScillaChecker.ts";
+import { runScillaChecker } from "./ScillaChecker";
 
 task(
   "scilla-check",
