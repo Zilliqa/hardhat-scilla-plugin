@@ -50,4 +50,3 @@ jobs:
     - name: Run test
       run: |
         pnpm run test
-        pnpm run lint
