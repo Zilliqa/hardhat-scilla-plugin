@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - US-270_rrw_test_1
 
 jobs:
   build:
