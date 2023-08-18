@@ -5,6 +5,11 @@ interface ErrorDict {
   [index: string]: TransactionError[];
 }
 
+/** Should we use native scilla binaries? */
+export function useNativeScilla() : boolean {
+  return (process.env.USE_NATIVE_SCILLA !== undefined)
+}
+
 /** Given a transaction, return a string[][] array containing a list of errors, decoded into their
  * symbolic values, for each level of the transaction.
  */

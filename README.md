@@ -13,7 +13,7 @@ This plugin is used to test scilla contracts in hardhat. It tries to be like eth
 ## Installation
 
 ```bash
-npm install hardhat-scilla-plugin
+pnpm install hardhat-scilla-plugin
 ```
 
 Import the plugin in your `hardhat.config.js`:
@@ -28,12 +28,21 @@ Or if you are using TypeScript, in your `hardhat.config.ts`:
 import "hardhat-scilla-plugin";
 ```
 
-You need to have `scilla-fmt` binary from the [Scilla project](https://github.com/Zilliqa/scilla/). It's used to parse scilla contracts and to provide better user experience while working with the plugin.
+
+
+## Running Scilla
+
+In order to check, and extract data from, Scilla contracts, we use binaries from the Scilla distribution itself.
+
+By default, we pull these from the `zilliqa/scilla` container in docker hub, using Scilla v0.13.3, but if you want to run them from your local machine, you can set the `USE_NATIVE_SCILLA` environment variable to run them from your `PATH`. If want to run `scilla-checker` with `USE_NATIVE_SCILLA` set, you will need to give the `-libDir` argument to tell it where to find the Scilla standard library.
+
+If you want to set `USE_NATIVE_SCILLA`, you need to have `scilla-fmt` and `scilla-checker` binaries from the [Scilla project](https://github.com/Zilliqa/scilla/) on your `PATH`. You can build them by following the instructions in the scilla project repository.
+
 ## Tasks
 
 This plugin adds the _scilla-check_ task to Hardhat:
 ```
-Hardhat version 2.11.2
+Hardhat version 2.16.0
 
 Usage: hardhat [GLOBAL OPTIONS] scilla-check --libdir <STRING> [...contracts]
 
