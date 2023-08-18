@@ -204,10 +204,6 @@ export async function deploy(
   [tx, sc] = await deployFromFile(contractInfo.path, init);
   sc.deployed_by = tx;
 
-  // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
-  const parsedCtors = contractInfo.parsedContract.ctors;
-  sc.ctors = generateTypeConstructors(parsedCtors);
-
   contractInfo.parsedContract.transitions.forEach((transition) => {
     sc[transition.name] = async (...args: any[]) => {
       let callParams: CallParams = {
@@ -261,6 +257,10 @@ export async function deploy(
       };
     });
   }
+
+  // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
+  const parsedCtors = contractInfo.parsedContract.ctors;
+  sc.ctors = generateTypeConstructors(parsedCtors);
 
   return sc;
 }
