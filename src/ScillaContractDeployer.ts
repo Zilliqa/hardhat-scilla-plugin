@@ -76,21 +76,32 @@ function read(f: string) {
   return t;
 }
 
-export function setAccount(accountNumber: number) {
+export function setAccount(account: number | Account) {
   if (setup === null) {
     throw new HardhatPluginError(
       "hardhat-scilla-plugin",
       "Please call initZilliqa function."
     );
   }
-  setup.zilliqa.wallet.defaultAccount = setup.accounts[accountNumber];
+
+  if (account instanceof Account) {
+    setup.zilliqa.wallet.defaultAccount = account;
+  } else {
+    setup.zilliqa.wallet.defaultAccount = setup.accounts[account];
+  }
 }
 
 export type ContractFunction<T = any> = (...args: any[]) => Promise<T>;
 
 export class ScillaContract extends Contract {
+  connect = (signer: Account) => {
+    this.executer = signer;
+    return this;
+  }
+  
   // Transitions and fields
   [key: string]: ContractFunction | any;
+  executer?: Account;
 }
 
 function handleParam(param: Field, arg: any): Value {
@@ -175,8 +186,7 @@ export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
   userDefinedLibraries: OptionalUserDefinedLibraryList,
-  ...args: any[]
-) {
+  ...args: any[]): Promise<ScillaContract> {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
   if (contractInfo === undefined) {
     throw new Error(`Scilla contract ${contractName} doesn't exist.`);
@@ -193,6 +203,7 @@ export async function deploy(
 
   [tx, sc] = await deployFromFile(contractInfo.path, init);
   sc.deployed_by = tx;
+
   contractInfo.parsedContract.transitions.forEach((transition) => {
     sc[transition.name] = async (...args: any[]) => {
       let callParams: CallParams = {
@@ -359,12 +370,12 @@ export async function deployFromFile(
     false
   );
 
-  return [tx, sc];
+  return [tx, sc as ScillaContract];
 }
 
 // call a smart contract's transition with given args and an amount to send from a given public key
 export async function sc_call(
-  sc: Contract,
+  sc: ScillaContract,
   transition: string,
   args: Value[] = [],
   callParams: CallParams
@@ -376,6 +387,10 @@ export async function sc_call(
     );
   }
 
+  if (callParams.pubKey === undefined && sc.executer) {
+    callParams.pubKey = sc.executer.publicKey;
+  }
+
   return sc.call(
     transition,
     args,
@@ -383,5 +398,5 @@ export async function sc_call(
     setup.attempts,
     setup.timeout,
     true
-  );
+);
 }
