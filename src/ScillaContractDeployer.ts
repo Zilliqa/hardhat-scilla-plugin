@@ -91,6 +91,7 @@ export type ContractFunction<T = any> = (...args: any[]) => Promise<T>;
 export class ScillaContract extends Contract {
   // Transitions and fields
   [key: string]: ContractFunction | any;
+  executer?: Account;
 }
 
 function handleParam(param: Field, arg: any): Value {
@@ -197,9 +198,7 @@ export async function deploy(
   const parsedCtors = contractInfo.parsedContract.ctors;
   sc.ctors = generateTypeConstructors(parsedCtors);
   sc.connect = (signer : Account) => {
-    sc.signer = new Wallet(
-      setup!.zilliqa.provider, [signer]
-    );
+    sc.executer = signer;
     return sc;
   }
 
@@ -227,7 +226,7 @@ export async function deploy(
         values.push(handleParam(param, args[index]));
       });
 
-      return sc_call(sc, transition.name, values, new BN(0), sc.account);
+      return sc_call(sc, transition.name, values, callParams);
     };
   });
 
@@ -370,11 +369,10 @@ export async function deployFromFile(
 
 // call a smart contract's transition with given args and an amount to send from a given public key
 export async function sc_call(
-  sc: Contract,
+  sc: ScillaContract,
   transition: string,
   args: Value[] = [],
-  amt = new BN(0),
-  account?: Account
+  callParams: CallParams
 ) {
   if (setup === null) {
     throw new HardhatPluginError(
@@ -383,18 +381,14 @@ export async function sc_call(
     );
   }
 
-  var params : CallParams = {
-    version: setup.version,
-    amount: amt,
-    gasPrice: setup.gasPrice,
-    gasLimit: setup.gasLimit,
-    pubKey: account?.publicKey
-  };
+  if (callParams.pubKey === undefined && sc.executer) {
+    callParams.pubKey = sc.executer.publicKey;
+  }
 
   return sc.call(
     transition,
     args,
-    params,
+    callParams,
     setup.attempts,
     setup.timeout,
     true
