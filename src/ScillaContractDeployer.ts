@@ -1,6 +1,6 @@
 // This is necessary so that tsc can resolve some of the indirect types for
 // sc_call, otherwise it errors out - richard@zilliqa.com 2023-03-09
-import { Account, Transaction } from "@zilliqa-js/account";
+import { Account, Transaction, Wallet } from "@zilliqa-js/account";
 import { CallParams, Contract, Init, State } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
@@ -175,7 +175,7 @@ export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
   userDefinedLibraries: OptionalUserDefinedLibraryList,
-  ...args: any[]) {
+  ...args: any[]): Promise<ScillaContract> {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
   if (contractInfo === undefined) {
     throw new Error(`Scilla contract ${contractName} doesn't exist.`);
@@ -193,13 +193,13 @@ export async function deploy(
   [tx, sc] = await deployFromFile(contractInfo.path, init);
   sc.deployed_by = tx;
 
-  // We set three special fields ctors, connect and account.
   // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
   const parsedCtors = contractInfo.parsedContract.ctors;
   sc.ctors = generateTypeConstructors(parsedCtors);
-  sc.account = null;
-  sc.connect = (account : Account) => {
-    sc.account = account;
+  sc.connect = (signer : Account) => {
+    sc.signer = new Wallet(
+      setup!.zilliqa.provider, [signer]
+    );
     return sc;
   }
 
@@ -227,7 +227,7 @@ export async function deploy(
         values.push(handleParam(param, args[index]));
       });
 
-      return await sc_call(sc, transition.name, values, new BN(0), sc.account);
+      return sc_call(sc, transition.name, values, new BN(0), sc.account);
     };
   });
 
