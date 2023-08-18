@@ -94,6 +94,11 @@ export function setAccount(account: number | Account) {
 export type ContractFunction<T = any> = (...args: any[]) => Promise<T>;
 
 export class ScillaContract extends Contract {
+  connect = (signer: Account) => {
+    this.executer = signer;
+    return this;
+  }
+  
   // Transitions and fields
   [key: string]: ContractFunction | any;
   executer?: Account;
@@ -202,10 +207,6 @@ export async function deploy(
   // Will shadow any transition named ctors. But done like this to avoid changing the signature of deploy.
   const parsedCtors = contractInfo.parsedContract.ctors;
   sc.ctors = generateTypeConstructors(parsedCtors);
-  sc.connect = (signer : Account) => {
-    sc.executer = signer;
-    return sc;
-  }
 
   contractInfo.parsedContract.transitions.forEach((transition) => {
     sc[transition.name] = async (...args: any[]) => {
@@ -369,7 +370,7 @@ export async function deployFromFile(
     false
   );
 
-  return [tx, sc];
+  return [tx, sc as ScillaContract];
 }
 
 // call a smart contract's transition with given args and an amount to send from a given public key
