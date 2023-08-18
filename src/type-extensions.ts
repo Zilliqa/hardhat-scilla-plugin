@@ -32,6 +32,6 @@ declare module "hardhat/types/runtime" {
     getZilliqaChainId: () => number;
     getNetworkUrl: () => string;
     getPrivateKeys: () => string[];
-    setActiveAccount: (account: Account) => void;
+    setActiveAccount: (indexOrAccount: number | Account) => void;
   }
 }

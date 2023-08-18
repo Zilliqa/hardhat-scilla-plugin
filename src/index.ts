@@ -87,7 +87,7 @@ extendEnvironment((hre) => {
       return (hre as any).network.config.accounts;
     });
   hre.setActiveAccount = lazyFunction(
-    () => (account: Account) : void => {
-      setAccount(account);
+    () => (indexOrAccount: number | Account) : void => {
+      setAccount(indexOrAccount);
     });
 });

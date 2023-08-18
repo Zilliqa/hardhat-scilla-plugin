@@ -76,14 +76,19 @@ function read(f: string) {
   return t;
 }
 
-export function setAccount(account: Account) {
+export function setAccount(account: number | Account) {
   if (setup === null) {
     throw new HardhatPluginError(
       "hardhat-scilla-plugin",
       "Please call initZilliqa function."
     );
   }
-  setup.zilliqa.wallet.defaultAccount = account;
+
+  if (account instanceof Account) {
+    setup.zilliqa.wallet.defaultAccount = account;
+  } else {
+    setup.zilliqa.wallet.defaultAccount = setup.accounts[account];
+  }
 }
 
 export type ContractFunction<T = any> = (...args: any[]) => Promise<T>;
