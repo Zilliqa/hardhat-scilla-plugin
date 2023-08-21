@@ -372,10 +372,16 @@ export async function deployFromFile(
     false
   );
 
+  // Let's add this function for further signer/executer changes.
   sc.connect = (signer: Account) => {
     sc.executer = signer;
     return sc;
   }
+
+  if (deployer) {
+    sc.connect(deployer)
+  }
+
   return [tx, sc];
 }
 
@@ -395,7 +401,6 @@ export async function sc_call(
 
   if (callParams.pubKey === undefined && sc.executer) {
     callParams.pubKey = sc.executer.publicKey;
-    console.log("pubkey set to: ", callParams.pubKey)
   }
 
   return sc.call(
