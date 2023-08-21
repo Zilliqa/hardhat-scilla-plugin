@@ -78,8 +78,8 @@ const network_url = "http://localhost:5555";
 const chain_id = 1;
 initZilliqa(network_url, chain_id, privateKeys);
 
-let contract: ScillaContract = await hre.deployScilla("SetGet");
-let contract: ScillaContract = await hre.deployScilla("HelloWorld", "Hello World"); // Contract with initial parameters.
+let contract: ScillaContract = await hre.deployScillaContract("SetGet");
+let contract: ScillaContract = await hre.deployScillaContract("HelloWorld", "Hello World"); // Contract with initial parameters.
 ```
 
 In the same way, you can deploy your libraries with their names:
@@ -93,6 +93,10 @@ contract2 = await hre.deployScillaWithLib("TestContract2",
       [{name: "MutualLib", address: mutualLibAddress}]
 ```
 
+Optionally to change the deployer of the contract, you can send an instance of `Account` class to these functions.
+```typescript
+let contract: ScillaContract = await hre.deployScillaContract("SetGet", account);
+```
 ### Call a transition
 
 It's not harder than calling a normal function in typescript.

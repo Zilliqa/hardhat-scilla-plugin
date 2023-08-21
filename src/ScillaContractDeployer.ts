@@ -93,16 +93,15 @@ export function setAccount(account: number | Account) {
 
 export type ContractFunction<T = any> = (...args: any[]) => Promise<T>;
 
-export class ScillaContract extends Contract {
-  connect = (signer: Account) => {
-    this.executer = signer;
-    return this;
+declare module "@zilliqa-js/contract" {
+  interface Contract {
+    executer?: Account;
+    [key: string]: ContractFunction | any;
+    connect: (signer: Account) => Contract;
   }
-  
-  // Transitions and fields
-  [key: string]: ContractFunction | any;
-  executer?: Account;
 }
+
+export type ScillaContract = Contract;
 
 function handleParam(param: Field, arg: any): Value {
   if (typeof param.typeJSON === "undefined") {
@@ -186,6 +185,7 @@ export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
   userDefinedLibraries: OptionalUserDefinedLibraryList,
+  deployer?: Account,
   ...args: any[]): Promise<ScillaContract> {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
   if (contractInfo === undefined) {
@@ -201,7 +201,7 @@ export async function deploy(
     ...args
   );
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init);
+  [tx, sc] = await deployFromFile(contractInfo.path, init, deployer);
   sc.deployed_by = tx;
 
   contractInfo.parsedContract.transitions.forEach((transition) => {
@@ -267,7 +267,8 @@ export async function deploy(
 
 export const deployLibrary = async (
   hre: HardhatRuntimeEnvironment,
-  libraryName: string
+  libraryName: string,
+  deployer?: Account
 ): Promise<ScillaContract> => {
   const contractInfo: ContractInfo = hre.scillaContracts[libraryName];
   if (contractInfo === undefined) {
@@ -278,7 +279,7 @@ export const deployLibrary = async (
   let tx: Transaction;
   const init: Init = fillLibraryInit();
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init);
+  [tx, sc] = await deployFromFile(contractInfo.path, init, deployer);
   sc.deployed_by = tx;
 
   return sc;
@@ -352,7 +353,8 @@ const fillInit = (
 // deploy a smart contract whose code is in a file with given init arguments
 export async function deployFromFile(
   path: string,
-  init: Init
+  init: Init,
+  deployer?: Account
 ): Promise<[Transaction, ScillaContract]> {
   if (setup === null) {
     throw new HardhatPluginError(
@@ -364,13 +366,17 @@ export async function deployFromFile(
   const code = read(path);
   const contract = setup.zilliqa.contracts.new(code, init);
   const [tx, sc] = await contract.deploy(
-    { ...setup },
+    { ...setup, pubKey: deployer ? deployer.publicKey : setup.accounts[0].publicKey },
     setup.attempts,
     setup.timeout,
     false
   );
 
-  return [tx, sc as ScillaContract];
+  sc.connect = (signer: Account) => {
+    sc.executer = signer;
+    return sc;
+  }
+  return [tx, sc];
 }
 
 // call a smart contract's transition with given args and an amount to send from a given public key
@@ -389,6 +395,7 @@ export async function sc_call(
 
   if (callParams.pubKey === undefined && sc.executer) {
     callParams.pubKey = sc.executer.publicKey;
+    console.log("pubkey set to: ", callParams.pubKey)
   }
 
   return sc.call(
