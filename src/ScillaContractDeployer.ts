@@ -375,6 +375,12 @@ export async function deployFromFile(
   // Let's add this function for further signer/executer changes.
   sc.connect = (signer: Account) => {
     sc.executer = signer;
+
+    // If account is not added already, add it to the list.
+    if (setup?.accounts.findIndex((acc) => acc.privateKey === signer.privateKey) === -1) {
+      setup?.zilliqa.wallet.addByPrivateKey(signer.privateKey);
+      setup?.accounts.push(signer);
+    }
     return sc;
   }
 
