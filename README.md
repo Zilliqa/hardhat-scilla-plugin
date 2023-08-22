@@ -132,6 +132,13 @@ export interface TxParams {
 await contract.Set(12, {nonce: 12, amount: new BN(1000)});
 ```
 
+### call a transition with a new account
+You can call `connect` on a contract to change its default account which is used to execute transitions.
+
+```typescript
+await contract.connect(newAccount).Set(123);
+```
+
 ### Get field value
 
 If a given contract has a filed named `msg` is possible to get its current value using a function call to `msg()`
