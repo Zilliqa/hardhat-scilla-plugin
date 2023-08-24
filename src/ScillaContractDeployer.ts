@@ -185,7 +185,6 @@ export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
   userDefinedLibraries: OptionalUserDefinedLibraryList,
-  deployer?: Account,
   ...args: any[]): Promise<ScillaContract> {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
   if (contractInfo === undefined) {
@@ -201,7 +200,7 @@ export async function deploy(
     ...args
   );
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init, deployer);
+  [tx, sc] = await deployFromFile(contractInfo.path, init);
   sc.deployed_by = tx;
 
   contractInfo.parsedContract.transitions.forEach((transition) => {
@@ -268,7 +267,6 @@ export async function deploy(
 export const deployLibrary = async (
   hre: HardhatRuntimeEnvironment,
   libraryName: string,
-  deployer?: Account
 ): Promise<ScillaContract> => {
   const contractInfo: ContractInfo = hre.scillaContracts[libraryName];
   if (contractInfo === undefined) {
@@ -279,7 +277,7 @@ export const deployLibrary = async (
   let tx: Transaction;
   const init: Init = fillLibraryInit();
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init, deployer);
+  [tx, sc] = await deployFromFile(contractInfo.path, init);
   sc.deployed_by = tx;
 
   return sc;
@@ -354,7 +352,6 @@ const fillInit = (
 export async function deployFromFile(
   path: string,
   init: Init,
-  deployer?: Account
 ): Promise<[Transaction, ScillaContract]> {
   if (setup === null) {
     throw new HardhatPluginError(
@@ -363,10 +360,11 @@ export async function deployFromFile(
     );
   }
 
+  const deployer = setup.zilliqa.wallet.defaultAccount ?? setup.accounts[0];
   const code = read(path);
   const contract = setup.zilliqa.contracts.new(code, init);
   const [tx, sc] = await contract.deploy(
-    { ...setup, pubKey: deployer ? deployer.publicKey : setup.accounts[0].publicKey },
+    { ...setup, pubKey: deployer.publicKey },
     setup.attempts,
     setup.timeout,
     false
@@ -384,9 +382,7 @@ export async function deployFromFile(
     return sc;
   }
 
-  if (deployer) {
-    sc.connect(deployer)
-  }
+  sc.connect(deployer);
 
   return [tx, sc];
 }

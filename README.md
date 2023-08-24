@@ -93,10 +93,7 @@ contract2 = await hre.deployScillaWithLib("TestContract2",
       [{name: "MutualLib", address: mutualLibAddress}]
 ```
 
-Optionally to change the deployer of the contract, you can send an instance of `Account` class to these functions.
-```typescript
-let contract: ScillaContract = await hre.deployScillaContract("SetGet", account);
-```
+To change the deployer of the contract, you can send an instance of `Account` class to `hre.setActiveAccount`.
 ### Call a transition
 
 It's not harder than calling a normal function in typescript.

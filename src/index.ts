@@ -42,10 +42,9 @@ extendEnvironment((hre) => {
   hre.deployScillaContract = lazyFunction(
     () => async (
       contractName: string,
-      deployer?: Account,
       ...args: any[]
     ): Promise<ScillaContract> => {
-      return deploy(hre, contractName, [], deployer, ...args);
+      return deploy(hre, contractName, [], ...args);
     }
   );
 
@@ -53,16 +52,15 @@ extendEnvironment((hre) => {
     () => async (
       contractName: string,
       userDefinedLibraries: UserDefinedLibrary[],
-      deployer?: Account,
       ...args: any[]
     ): Promise<ScillaContract> => {
-      return deploy(hre, contractName, userDefinedLibraries, deployer, ...args);
+      return deploy(hre, contractName, userDefinedLibraries, ...args);
     }
   );
 
   hre.deployScillaLibrary = lazyFunction(
-    () => async (libraryName: string, deployer?: Account): Promise<ScillaContract> => {
-      return deployLibrary(hre, libraryName, deployer);
+    () => async (libraryName: string): Promise<ScillaContract> => {
+      return deployLibrary(hre, libraryName);
     }
   );
 
@@ -70,9 +68,8 @@ extendEnvironment((hre) => {
     () => async (
       contractPath: string,
       init: Init,
-      deployer?: Account
     ): Promise<[Transaction, ScillaContract]> => {
-      return deployFromFile(contractPath, init, deployer);
+      return deployFromFile(contractPath, init);
     }
   );
 
