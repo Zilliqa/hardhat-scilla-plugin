@@ -201,8 +201,10 @@ const extractContractFields = (cfieldsElem: any[]): Fields => {
           name: fieldNameData[1],
         };
       } else if (fieldTypeData[0] === "ADT") {
+        const adt = parseAdt(fieldTypeData);
         return {
-          type: "ADT",
+          typeJSON: adt,
+          type: adt.ctor + adt.argtypes.map((arg: Field) => " " + arg.type).join(" "),
           name: fieldNameData[1],
         };
       } else if (fieldTypeData[0] === "MapType") {
@@ -259,6 +261,15 @@ const extractTransitions = (ccompsElem: any[]): Transitions => {
   });
 };
 
+function parseAdt(row: any): ADTField {
+  const ctor = row[1][1][1];
+  const argtypes = row[2].map(parseField);
+  return {
+    ctor,
+    argtypes,
+  };
+}
+
 function parseField(row: any): Field {
   const field_type = row[0];
 
@@ -270,17 +281,12 @@ function parseField(row: any): Field {
       type,
     };
   } else if (field_type === "ADT") {
-    const ctor = row[1][1][1];
-    const argtypes = row[2].map(parseField);
+    const adt = parseAdt(row);
     const name = row[0][1][1];
-    const ADT: ADTField = {
-      ctor,
-      argtypes,
-    };
     return {
+      typeJSON: adt,
+      type: adt.ctor + adt.argtypes.map((arg: Field) => " " + arg.type).join(" "),
       name,
-      typeJSON: ADT,
-      type: ctor + argtypes.map((arg: Field) => " " + arg.type).join(" "),
     };
   } else if (field_type === "Address") {
     const type = "ByStr20";
