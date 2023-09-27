@@ -330,12 +330,21 @@ const fillInit = (
         `Expected to receive ${contractParams.length} parameters for ${contractName} deployment but got ${userSpecifiedArgs.length}`
       );
     }
+
     contractParams.forEach((param: Field, index: number) => {
-      init.push({
-        vname: param.name,
-        type: param.type.toString(),
-        value: userSpecifiedArgs[index].toString(),
-      });
+      if (isNumeric(param.type)) {
+        init.push({
+          vname: param.name,
+          type: param.type,
+          value: userSpecifiedArgs[index].toString(),
+        });
+      } else {    // It's an ADT or string
+        init.push({
+          vname: param.name,
+          type: param.type,
+          value: userSpecifiedArgs[index] as any,
+        });
+      }
     });
   } else {
     if (userSpecifiedArgs.length > 0) {
