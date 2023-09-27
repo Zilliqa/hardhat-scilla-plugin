@@ -101,6 +101,12 @@ describe("", function () {
       const ecdsa = parseScilla("contracts/Codehash.scilla");
       expect(ecdsa.transitions[0].params[0].type).to.be.eq("ByStr20");
     });
+  
+    it("should parse adt param to contract constructor", async () => {
+      const listParamContract = parseScilla("contracts/ListParamToConstructor.scilla");
+      expect(listParamContract.constructorParams![0].type).to.be.eq("List ByStr20");
+      expect(listParamContract.constructorParams![0].name).to.be.eq("owner_list");
+    });
   });
 
   describe("Scilla Parser should parse libraries successfully", function () {

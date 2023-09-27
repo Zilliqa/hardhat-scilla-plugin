@@ -1,0 +1,6 @@
+scilla_version 0
+contract MultiSigWallet
+(
+  owner_list: List ByStr20,
+  num_of_required_signatures: Uint32
+)
