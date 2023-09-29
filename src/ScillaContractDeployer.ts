@@ -1,6 +1,6 @@
 // This is necessary so that tsc can resolve some of the indirect types for
 // sc_call, otherwise it errors out - richard@zilliqa.com 2023-03-09
-import { Account, Transaction, TxParams } from "@zilliqa-js/account";
+import { Account, Transaction } from "@zilliqa-js/account";
 import { CallParams, Contract, Init, State } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
