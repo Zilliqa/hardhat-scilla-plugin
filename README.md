@@ -82,6 +82,26 @@ let contract: ScillaContract = await hre.deployScillaContract("SetGet");
 let contract: ScillaContract = await hre.deployScillaContract("HelloWorld", "Hello World"); // Contract with initial parameters.
 ```
 
+You can override the following parameters while deploying a contract:
+```typescript
+TxParams {
+    version: number;
+    toAddr: string;
+    amount: BN;
+    gasPrice: BN;
+    gasLimit: Long;
+    code?: string;
+    data?: string;
+    receipt?: TxReceipt;
+    nonce?: number;
+    pubKey?: string;
+    signature?: string;
+}
+```
+```typescript
+let contract: ScillaContract = await hre.deployScillaContract("HelloWorld", "Hello World", {gasLimit: 8000}); // Override a parameter
+```
+
 In the same way, you can deploy your libraries with their names:
 ```typescript
 let library: ScillaContract = await hre.deployScillaLibrary("MyLibrary");

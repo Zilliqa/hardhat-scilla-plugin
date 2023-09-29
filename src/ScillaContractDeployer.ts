@@ -1,6 +1,6 @@
 // This is necessary so that tsc can resolve some of the indirect types for
 // sc_call, otherwise it errors out - richard@zilliqa.com 2023-03-09
-import { Account, Transaction } from "@zilliqa-js/account";
+import { Account, Transaction, TxParams } from "@zilliqa-js/account";
 import { CallParams, Contract, Init, State } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
@@ -193,6 +193,12 @@ export async function deploy(
 
   let sc: ScillaContract;
   let tx: Transaction;
+  let txParamsForContractDeployment = {};
+  if (contractInfo.parsedContract.constructorParams && args.length === contractInfo.parsedContract.constructorParams.length + 1) {
+    // The last param is Tx info such as amount, nonce, gasPrice
+    txParamsForContractDeployment = args.pop();
+  }
+
   const init: Init = fillInit(
     contractName,
     userDefinedLibraries,
@@ -200,7 +206,7 @@ export async function deploy(
     ...args
   );
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init);
+  [tx, sc] = await deployFromFile(contractInfo.path, init, txParamsForContractDeployment);
   sc.deployed_by = tx;
 
   contractInfo.parsedContract.transitions.forEach((transition) => {
@@ -277,7 +283,7 @@ export const deployLibrary = async (
   let tx: Transaction;
   const init: Init = fillLibraryInit();
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init);
+  [tx, sc] = await deployFromFile(contractInfo.path, init, {});
   sc.deployed_by = tx;
 
   return sc;
@@ -361,6 +367,7 @@ const fillInit = (
 export async function deployFromFile(
   path: string,
   init: Init,
+  txParamsForContractDeployment: any
 ): Promise<[Transaction, ScillaContract]> {
   if (setup === null) {
     throw new HardhatPluginError(
@@ -373,7 +380,7 @@ export async function deployFromFile(
   const code = read(path);
   const contract = setup.zilliqa.contracts.new(code, init);
   const [tx, sc] = await contract.deploy(
-    { ...setup, pubKey: deployer.publicKey },
+    { ...setup, pubKey: deployer.publicKey, ...txParamsForContractDeployment },
     setup.attempts,
     setup.timeout,
     false
