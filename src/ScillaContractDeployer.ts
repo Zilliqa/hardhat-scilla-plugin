@@ -283,7 +283,7 @@ export const deployLibrary = async (
   let tx: Transaction;
   const init: Init = fillLibraryInit();
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init, {});
+  [tx, sc] = await deployFromFile(contractInfo.path, init, {});   // FIXME: In  #45
   sc.deployed_by = tx;
 
   return sc;
