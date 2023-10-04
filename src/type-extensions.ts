@@ -33,5 +33,6 @@ declare module "hardhat/types/runtime" {
     getNetworkUrl: () => string;
     getPrivateKeys: () => string[];
     setActiveAccount: (indexOrAccount: number | Account) => void;
+    setScillaDefaults: (params: any) => void;
   }
 }

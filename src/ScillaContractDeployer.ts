@@ -38,6 +38,7 @@ export interface Setup {
   accounts: Account[];
 }
 
+
 export let setup: Setup | null = null;
 
 // The optional params are listed in popularity order.
@@ -74,6 +75,25 @@ export const initZilliqa = (
 function read(f: string) {
   const t = fs.readFileSync(f, "utf8");
   return t;
+}
+
+/// Allows you to change setup parameters. Available params:
+/// gasPrice, gasLimit, attempts, timeout.
+export function updateSetup(args: any) {
+  if (setup === null) {
+    throw new HardhatPluginError("hardhat-scilla-plugin", "Please call the initZilliqa function.");
+  }
+  let newSetup : Setup = {
+    zilliqa: setup.zilliqa,
+    version: setup.version,
+    gasPrice: args.gasPrice ? units.toQa(args.gasPrice.toString(), units.Units.Li) : setup.gasPrice,
+    gasLimit: args.gasLimit ? Long.fromNumber(args.gasLimit) : setup.gasLimit,
+    attempts: args.attempts ?? setup.attempts,
+    timeout:  args.timeout ?? setup.timeout,
+    accounts : setup.accounts
+  };
+  setup = newSetup;
+  console.log(`Setup ${JSON.stringify(setup)}`)
 }
 
 export function setAccount(account: number | Account) {

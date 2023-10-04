@@ -28,6 +28,7 @@ type ContractMapByPath = Record<ContractPath, ContractInfo>;
 export const updateContractsInfo = async () => {
   let contractsInfo: ContractMapByName = {};
   const files = glob.sync("contracts/**/*(*.scilla|*.scillib)");
+  console.log(`files = ${files}`);
   if (files.length === 0) {
     console.log(
       clc.yellowBright("No scilla contracts were found in contracts directory.")

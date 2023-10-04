@@ -28,6 +28,13 @@ export class ZilliqaHardhatObject {
     return this.getZilliqaSetup().accounts;
   }
 
+  // Retrieve the default acount used to sign transactions.
+  public getDefaultAccount(): Account | undefined {
+    let wallet = this.getZilliqaSetup().zilliqa.wallet;
+    let defaultAccount = wallet.defaultAccount;
+    return defaultAccount;
+  }
+
   /** Push a private key onto the accounts array, returning a pair of the
    * account and the index at which it can be found
    */
@@ -37,7 +44,7 @@ export class ZilliqaHardhatObject {
     this.getZilliqaJSObject().wallet.addByPrivateKey(privKey);
     return [ account, val ];
   }
-  
+
   public createPrivateKey() {
     const privateKey = zcrypto.schnorr.generatePrivateKey();
     return privateKey;
@@ -47,7 +54,7 @@ export class ZilliqaHardhatObject {
                         txParams = { }): Promise<Transaction> {
     return this.transferToAddress(toAccount.address, value, txParams);
   }
-  
+
   public async transferToAddress(toAddress: string, value: BN,
                         txParams = { }) : Promise<Transaction> {
     const setup = this.getZilliqaSetup();

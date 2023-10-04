@@ -9,6 +9,7 @@ import {
   deployLibrary,
   ScillaContract,
   UserDefinedLibrary,
+  updateSetup,
   setAccount
 } from "./ScillaContractDeployer";
 import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
@@ -38,6 +39,11 @@ extendEnvironment((hre) => {
   // We use lazyObject to avoid initializing things until they are actually
   // needed.
   hre.scillaContracts = lazyObject(() => loadScillaContractsInfo());
+  hre.setScillaDefaults = lazyFunction(
+    () => (params) => {
+      return updateSetup(params);
+    }
+  );
 
   hre.deployScillaContract = lazyFunction(
     () => async (
