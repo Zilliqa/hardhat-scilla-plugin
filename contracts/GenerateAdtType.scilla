@@ -1,0 +1,17 @@
+scilla_version 0
+contract GenerateAdtType
+(
+)
+
+transition tr0(arg: (List (Pair ByStr20 (List (Pair Uint32 Uint128)))))
+end
+
+transition tr1(arg: (List Uint128))
+end
+
+transition tr2(arg: (Pair Uint32 Uint128))
+end
+
+transition tr3(arg: (List (Pair ByStr20 ByStr20)))
+end
+

@@ -270,6 +270,22 @@ function parseAdt(row: any): ADTField {
   };
 }
 
+function generateAdtType(field: ADTField): string {
+  if (field.argtypes.length === 0) {
+    return field.ctor;
+  }
+
+  const type = `${field.ctor} ${field.argtypes.map((arg: Field) =>{
+    // Here we're sure that type is ADTField
+    const typeJson: ADTField = arg.typeJSON as ADTField;
+    if (["Pair", "List"].includes(typeJson.ctor))
+      return `(${arg.type})`
+    else 
+      return arg.type
+  }).reduce((prev, current) => `${prev} ${current}`)}`;
+  return type;
+}
+
 function parseField(row: any): Field {
   const field_type = row[0];
 
@@ -285,7 +301,7 @@ function parseField(row: any): Field {
     const name = row[0][1][1];
     return {
       typeJSON: adt,
-      type: adt.ctor + adt.argtypes.map((arg: Field) => " " + arg.type).join(" "),
+      type: generateAdtType(adt),
       name,
     };
   } else if (field_type === "Address") {

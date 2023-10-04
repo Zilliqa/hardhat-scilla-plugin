@@ -69,7 +69,7 @@ extendEnvironment((hre) => {
       contractPath: string,
       init: Init,
     ): Promise<[Transaction, ScillaContract]> => {
-      return deployFromFile(contractPath, init);
+      return deployFromFile(contractPath, init, {});
     }
   );
 
