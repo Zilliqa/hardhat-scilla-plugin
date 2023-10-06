@@ -99,12 +99,13 @@ const saveContractsInfo = (contracts: ContractMapByPath) => {
   fs.writeFileSync(CONTRACTS_INFO_CACHE_FILE, JSON.stringify(contracts));
 };
 
-const getFileHash = (fileName: string): string => {
+export const getFileHash = (fileName: string): string => {
   const contents = fs.readFileSync(fileName, "utf8");
   const hashSum = createHash("md5");
   hashSum.update(contents);
   return hashSum.digest("hex");
 };
+
 
 const parseScillaFile = async (
   fileName: string
