@@ -47,6 +47,9 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
+    - name: Forcibly install Scilla tools (because otherwise we time out the tests)
+      run: pnpm run force-scilla-download
+
     - name: Run test
       run: |
         pnpm run test

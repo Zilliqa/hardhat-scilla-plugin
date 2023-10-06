@@ -23,7 +23,8 @@
     "test-live": "mocha --exit --recursive 'test/**/*.live.test.ts'",
     "build": "tsc",
     "watch": "tsc -w",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "force-scilla-download": "npx ts-node scripts/force-scilla-download.ts"
   },
   "files": [
     "dist/src/",
