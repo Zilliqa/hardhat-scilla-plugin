@@ -31,6 +31,9 @@
     "LICENSE",
     "README.md"
   ],
+  "mocha" : {
+    "file" : [ "./test/prepare.setup.ts" ]
+  },
   "devDependencies": {
     "@types/chai": "^4.3.5",
     "@types/cli-color": "^2.0.2",
