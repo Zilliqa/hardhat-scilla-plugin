@@ -37,7 +37,8 @@ export async function contractFromAddress(hre: HardhatRuntimeEnvironment, addres
   if (codeResult !== undefined && codeResult.result !== undefined
     && codeResult.result.code !== undefined) {
     let codeText = codeResult.result.code;
-    // Now parse it. Sadly, need a file for this. Even more sadly,m 
+    // Now parse it. Sadly, need a file for this. Even more sadly, there's no good way to do it
+    // generically (tempy causes us to throw module errors :-( )
     let tempFile = ZilliqaUtils.createTemporaryFile('contract', 'scilla');
     fs.writeFileSync( tempFile, codeText );
     let parsed = await parseScilla(tempFile);

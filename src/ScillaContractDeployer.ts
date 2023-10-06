@@ -84,15 +84,20 @@ export function updateSetup(args: any) {
   if (setup === null) {
     throw new HardhatPluginError("hardhat-scilla-plugin", "Please call the initZilliqa function.");
   }
-  let newSetup : Setup = {
-    zilliqa: setup.zilliqa,
-    version: setup.version,
-    gasPrice: args.gasPrice ? units.toQa(args.gasPrice.toString(), units.Units.Li) : setup.gasPrice,
-    gasLimit: args.gasLimit ? Long.fromNumber(args.gasLimit) : setup.gasLimit,
-    attempts: args.attempts ?? setup.attempts,
-    timeout:  args.timeout ?? setup.timeout,
-    accounts : setup.accounts
-  };
+  let overrides : any = { }
+  if (args.gasPrice) {
+    overrides.gasPrice =  units.toQa(args.gasPrice.toString(), units.Units.Li);
+  }
+  if (args.gasLimit) {
+    overrides.gasLimit = Long.fromNumber(args.gasLimit);
+  }
+  if (args.timeout) {
+    overrides.timeout = args.timeout;
+  }
+  if (args.attempts) {
+    overrides.attempts = args.attempts;
+  }
+  let newSetup : Setup = { ...setup, ... overrides };
   setup = newSetup;
 }
 

@@ -114,6 +114,39 @@ contract2 = await hre.deployScillaWithLib("TestContract2",
 ```
 
 To change the deployer of the contract, you can send an instance of `Account` class to `hre.setActiveAccount`.
+
+### Change the default parameters when deploying a contract
+
+You can call
+
+```
+hre.setScillaDefaults( obj )
+```
+
+to set the defaults used when deploying a Scilla contract. Parameters supported are:
+
+ * `gasPrice` - a string denoting the gas price in `Li` (to match the `initZilliqa` use).
+ * `gasLimit` - a string denoting the gas limit (in `Qa`, to match `initZilliqa` use)
+ * `attempts` - a number denoting the number of attempts to make to check whether a transaction has been accepted
+ * `timeout` - the space between attempts, in milliseconds.
+
+### Connect to an existing Scilla contract
+
+Call
+
+```
+hre.interactWithScillaContract(address)
+```
+
+To:
+
+ * Retrieve the code for a contract from the configured chain.
+ * Parse it.
+ * Construct a proxy contract object for it.
+ * Return that object, or `undefined` if we failed.
+
+`address` should be a string, and the function returns `ScillaContract | undefined`.
+
 ### Call a transition
 
 It's not harder than calling a normal function in typescript.
@@ -150,6 +183,7 @@ await contract.Set(12, {nonce: 12, amount: new BN(1000)});
 ```
 
 ### call a transition with a new account
+
 You can call `connect` on a contract to change its default account which is used to execute transitions.
 
 ```typescript
@@ -224,7 +258,7 @@ For easier value matching, some value conversions are done under the hood.
 * 128/256 bit integer values are converted to `BigNumber`
 * `Option` is converted to its inner value if exists any, or `null` otherwise.
 * `Bool` is converted to underlying boolean value.
- 
+
 for more tests please take look at [scilla tests](https://github.com/Zilliqa/Zilliqa/tree/master/tests/EvmAcceptanceTests/test/scilla).
 
 ### TODO

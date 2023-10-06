@@ -7,6 +7,7 @@ import { useEnvironment } from "./helpers"
 
 import chai from 'chai';
 import { scillaChaiEventMatcher } from '../src/ScillaChaiMatchers';
+import { setup } from '../src/ScillaContractDeployer';
 
 chai.use(scillaChaiEventMatcher);
 
