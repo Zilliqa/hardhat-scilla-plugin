@@ -34,9 +34,10 @@ describe("", function () {
 
     it("Should be able to transfer ZIL between accounts", async function () {
       this.hre.setActiveAccount(0);
+      this.hre.setScillaDefaults( { "gasPrice" : "2000000000" });
       const privKey = this.zobj.createPrivateKey();
       const [acc,idx] = this.zobj.pushPrivateKey(privKey);
-      const VAL = new BN(100000002000000);
+      const VAL = new BN("100000000000000001000");
       const txn = await this.zobj.transferTo(acc, new BN(VAL));
       const [bal,nonce] = await this.zobj.getBalance(acc);
       const transferredBalance = bal;
@@ -46,7 +47,6 @@ describe("", function () {
       // Now transfer it back.
       this.hre.setActiveAccount(idx);
       // Lose 10 zil here for gas.
-      // console.log(`Transferredbalance ${transferredBalance}`);
       const txn2 = await this.zobj.transferToAddress(this.zobj.getAccounts()[0].address, new BN(1_000));
       expect(txn2['receipt']['success']).to.be.true;
       this.hre.setActiveAccount(0);

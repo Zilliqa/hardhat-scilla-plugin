@@ -1,6 +1,6 @@
 {
   "name": "hardhat-scilla-plugin",
-  "version": "3.6.1",
+  "version": "3.7.0",
   "description": "Hardhat TypeScript plugin for scilla testing",
   "repository": "github:Zilliqa/hardhat-scilla-plugin",
   "author": "Saeed Dadkhah",
@@ -23,7 +23,8 @@
     "test-live": "mocha --exit --recursive 'test/**/*.live.test.ts'",
     "build": "tsc",
     "watch": "tsc -w",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "force-scilla-download": "npx ts-node scripts/force-scilla-download.ts"
   },
   "files": [
     "dist/src/",
@@ -31,6 +32,9 @@
     "LICENSE",
     "README.md"
   ],
+  "mocha" : {
+    "file" : [ "./test/prepare.setup.ts" ]
+  },
   "devDependencies": {
     "@types/chai": "^4.3.5",
     "@types/cli-color": "^2.0.2",

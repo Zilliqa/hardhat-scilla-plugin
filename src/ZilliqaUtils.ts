@@ -1,9 +1,29 @@
 import { Transaction } from "@zilliqa-js/account";
 import { TransactionError } from "@zilliqa-js/core";
+import path from 'path';
+import fs from 'fs';
+import os from 'os';
 
 interface ErrorDict {
   [index: string]: TransactionError[];
 }
+
+/** Create a temporary file and return its name */
+export function createTemporaryFile(prefix: string, extension: string) : string {
+  let tempDir = os.tmpdir();
+  let dirName = fs.mkdtempSync(`${tempDir}/${prefix}`);
+
+  return `${dirName}/temp${prefix}.${extension}`
+}
+
+/** Delete the temporary file and its directory */
+export function deleteTemporaryFile(fileName: string) {
+  // Find the parent directory
+  var parent = path.dirname(fileName);
+  // console.log(`Would delete ${parent}`);
+  fs.rmSync(parent, { recursive: true, force: true });
+}
+
 
 /** Should we use native scilla binaries? */
 export function useNativeScilla() : boolean {

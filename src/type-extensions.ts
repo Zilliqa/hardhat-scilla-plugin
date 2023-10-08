@@ -14,6 +14,9 @@ import { ZilliqaHardhatObject } from "./ZilliqaHardhatObject";
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
     scillaContracts: ScillaContracts;
+    interactWithScillaContract: (
+      contractAdress: string
+    ) => Promise<ScillaContract | undefined>;
     deployScillaContract: (
       contractName: string,
       ...args: any[]
@@ -33,5 +36,6 @@ declare module "hardhat/types/runtime" {
     getNetworkUrl: () => string;
     getPrivateKeys: () => string[];
     setActiveAccount: (indexOrAccount: number | Account) => void;
+    setScillaDefaults: (params: any) => void;
   }
 }

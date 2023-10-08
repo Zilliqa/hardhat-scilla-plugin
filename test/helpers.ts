@@ -2,6 +2,7 @@ import { resetHardhatContext } from "hardhat/plugins-testing";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { initZilliqa } from "../src/ScillaContractDeployer";
 import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
+import { updateContractsInfo } from "../src/ScillaContractsInfoUpdater";
 import path from "path";
 
 declare module "mocha" {
@@ -17,8 +18,8 @@ export function useEnvironment(fixtureProjectName: string) {
     this.hre = require("hardhat");
     await initZilliqa(process.env.ZILLIQA_API_URL || this.hre.getNetworkUrl(), this.hre.getZilliqaChainId(),
                       this.hre.getPrivateKeys(), 30);
+    await updateContractsInfo();
     this.zobj = this.hre.zilliqa;
-    //this.zobj = new ZilliqaHardhatObject.ZilliqaHardhatObject();
   });
 
   after("Resetting hardhat", function () {

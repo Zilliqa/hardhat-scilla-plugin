@@ -1,0 +1,9 @@
+2023-10-06	Richard Watts	<richard@zilliqa.com>
+
+	* index.ts: hre.interactWithScillaContract(address) - allows you to interact with an already-deployed Scilla contract.
+
+2023-10-03	Richard Watts	<richard@zilliqa.com>
+
+	* index.ts: A new hre.setScillaDefaults() allowing you to change the default gasPrice, gasLimit, timeout and attempts
+	* ZilliqaHardhatObject.ts: getDefaultAccount() allows you to retrieve the default signing account.
+	* test/deploy.live.test.ts: Test that we can actually deploy contracts.

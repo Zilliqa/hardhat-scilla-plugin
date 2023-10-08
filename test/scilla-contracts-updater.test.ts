@@ -28,7 +28,7 @@ describe("", function () {
     it("should have correct contract path", function () {
       const contracts = loadScillaContractsInfo();
       helloContract = contracts.HelloWorld;
-      expect(helloContract.path).to.be.eq("contracts/HelloWorld.scilla");
+      expect(helloContract.path).to.be.eq("contracts/scilla/HelloWorld.scilla");
     });
 
     it("Should have HelloWorld as the contract name", function () {

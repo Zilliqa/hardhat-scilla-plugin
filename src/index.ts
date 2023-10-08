@@ -9,9 +9,11 @@ import {
   deployLibrary,
   ScillaContract,
   UserDefinedLibrary,
+  updateSetup,
   setAccount
 } from "./ScillaContractDeployer";
 import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
+import { contractFromAddress } from "./ScillaContractInteractor";
 import "./task-extensions";
 // This import is needed to let the TypeScript compiler know that it should include your type
 // extensions in your npm package's types file.
@@ -38,6 +40,19 @@ extendEnvironment((hre) => {
   // We use lazyObject to avoid initializing things until they are actually
   // needed.
   hre.scillaContracts = lazyObject(() => loadScillaContractsInfo());
+  hre.setScillaDefaults = lazyFunction(
+    () => (params) => {
+      return updateSetup(params);
+    }
+  );
+
+  hre.interactWithScillaContract = lazyFunction(
+    () => async(
+      contractAddress: string
+    ) : Promise<ScillaContract | undefined> => {
+      return contractFromAddress(hre, contractAddress);
+    }
+  );
 
   hre.deployScillaContract = lazyFunction(
     () => async (

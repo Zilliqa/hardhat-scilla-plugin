@@ -10,7 +10,7 @@ chai.use(chaiSubset);
 describe("Scilla Parser should parse contracts successfully", function () {
   let adtContract: ParsedContract;
   before(function () {
-    adtContract = parseScilla("contracts/GenerateAdtType.scilla");
+    adtContract = parseScilla("contracts/scilla/GenerateAdtType.scilla");
   });
 
   it("should generate valid type for (List (Pair ByStr20 (List (Pair Uint32 Uint128)))))", async () => {

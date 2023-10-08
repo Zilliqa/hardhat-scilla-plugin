@@ -14,8 +14,8 @@ describe("", function () {
     let contract: ParsedContract;
     let adtContract: ParsedContract;
     before(function () {
-      contract = parseScilla("contracts/HelloWorld.scilla");
-      adtContract = parseScilla("contracts/ADTTest.scilla");
+      contract = parseScilla("contracts/scilla/HelloWorld.scilla");
+      adtContract = parseScilla("contracts/scilla/ADTTest.scilla");
     });
 
     it("Should have HelloWorld as the contract name", function () {
@@ -98,12 +98,12 @@ describe("", function () {
     });
 
     it("should parse _codehash address type as ByStr20", async () => {
-      const ecdsa = parseScilla("contracts/Codehash.scilla");
+      const ecdsa = parseScilla("contracts/scilla/Codehash.scilla");
       expect(ecdsa.transitions[0].params[0].type).to.be.eq("ByStr20");
     });
   
     it("should parse adt param to contract constructor", async () => {
-      const listParamContract = parseScilla("contracts/ListParamToConstructor.scilla");
+      const listParamContract = parseScilla("contracts/scilla/ListParamToConstructor.scilla");
       expect(listParamContract.constructorParams![0].type).to.be.eq("List ByStr20");
       expect(listParamContract.constructorParams![0].name).to.be.eq("owner_list");
     });
@@ -112,7 +112,7 @@ describe("", function () {
   describe("Scilla Parser should parse libraries successfully", function () {
     let contract: ParsedContract;
     before(async function () {
-      contract = await parseScillaLibrary("contracts/AdditionLib.scillib");
+      contract = await parseScillaLibrary("contracts/scilla/AdditionLib.scillib");
     });
     it("Should extract library name", function () {
       expect(contract.name).to.be.eq("AdditionLib");
