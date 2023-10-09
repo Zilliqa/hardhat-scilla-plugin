@@ -285,7 +285,6 @@ npx hardhat scilla-check --libdir path_to_stdlib contracts/scilla/helloWorld.sci
 
 # Plugin development
 
-
 ## Running internal tests
 
 If you want to monitor your requests:
