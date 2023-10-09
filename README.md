@@ -283,7 +283,10 @@ npx hardhat scilla-check --libdir path_to_stdlib contracts/scilla/helloWorld.sci
 
 - Add `scilla-fmt` task
 
-### Running internal tests
+# Plugin development
+
+
+## Running internal tests
 
 If you want to monitor your requests:
 
@@ -313,3 +316,9 @@ yarn test-all
 
 Will run both sets of tests.
 
+## Publishing the plugin
+
+In order to publish the plugin to [npmjs.com](https://www.npmjs.com/package/hardhat-scilla-plugin), follow these steps:
+1. Increase the plugin version in [package.json](./package.json)
+2. Run `yarn login` and enter your credentials.
+3. Run `yarn publish`. This command will run `yarn build` && `yarn test` beforehand. 
