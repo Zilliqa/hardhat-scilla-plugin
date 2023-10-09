@@ -298,19 +298,19 @@ Set `ZILLIQA_API_URL` to the URL of a network to test - or to eg. `http://localh
 Set `ZILLIQA_NETWORK` to the name of the network to test against - see `test/fixture-projects/hardhat-proxy/hardhat.config.ts` for details.
 
 ```sh
-yarn test
+pnpm test
 ```
 
 Will run all tests that don't require an external network (so that test passes will be deterministic).
 
 ```sh
-yarn test-live
+pnpm test-live
 ```
 
 Will run just the tests that do require an external network.
 
 ```sh
-yarn test-all
+pnpm test-all
 ```
 
 Will run both sets of tests.
@@ -319,5 +319,6 @@ Will run both sets of tests.
 
 In order to publish the plugin to [npmjs.com](https://www.npmjs.com/package/hardhat-scilla-plugin), follow these steps:
 1. Increase the plugin version in [package.json](./package.json)
-2. Run `yarn login` and enter your credentials.
-3. Run `yarn publish`. This command will run `yarn build` && `yarn test` beforehand. 
+2. Run `npm login` and enter your credentials.
+3. Run `pnpm install`
+3. Run `pnpm publish`. This command will run `pnpm build` && `pnpm test` beforehand. 
