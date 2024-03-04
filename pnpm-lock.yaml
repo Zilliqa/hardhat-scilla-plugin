@@ -50,14 +50,14 @@ devDependencies:
     specifier: ^2.0.6
     version: 2.0.6
   '@types/fs-extra':
-    specifier: ^11.0.2
-    version: 11.0.2
+    specifier: ^11.0.4
+    version: 11.0.4
   '@types/glob':
     specifier: ^8.1.0
     version: 8.1.0
   '@types/mocha':
-    specifier: ^10.0.2
-    version: 10.0.2
+    specifier: ^10.0.6
+    version: 10.0.6
   '@types/node':
     specifier: ^20.8.4
     version: 20.8.4
@@ -963,8 +963,8 @@ packages:
     resolution: {integrity: sha512-uLK0/0dOYdkX8hNsezpYh1gc8eerbhf9bOKZ3e24sP67703mw9S14/yW6mSTatiaKO9v+mU/a1EVy4rOXXeZTA==}
     dev: true
 
-  /@types/fs-extra@11.0.2:
-    resolution: {integrity: sha512-c0hrgAOVYr21EX8J0jBMXGLMgJqVf/v6yxi0dLaJboW9aQPh16Id+z6w2Tx1hm+piJOLv8xPfVKZCLfjPw/IMQ==}
+  /@types/fs-extra@11.0.4:
+    resolution: {integrity: sha512-yTbItCNreRooED33qjunPthRcSjERP1r4MqCZc7wv0u2sUkzTFp45tgUfS5+r7FrZPdmCCNflLhVSP/o+SemsQ==}
     dependencies:
       '@types/jsonfile': 6.1.2
       '@types/node': 20.8.4
@@ -1001,8 +1001,8 @@ packages:
     resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==}
     dev: true
 
-  /@types/mocha@10.0.2:
-    resolution: {integrity: sha512-NaHL0+0lLNhX6d9rs+NSt97WH/gIlRHmszXbQ/8/MV/eVcFNdeJ/GYhrFuUc8K7WuPhRhTSdMkCp8VMzhUq85w==}
+  /@types/mocha@10.0.6:
+    resolution: {integrity: sha512-dJvrYWxP/UcXm36Qn36fxhUKu8A/xMRXVT2cliFF1Z7UA9liG5Psj3ezNSZw+5puH2czDXRLcXQxf8JbJt0ejg==}
     dev: true
 
   /@types/node@20.8.4:
