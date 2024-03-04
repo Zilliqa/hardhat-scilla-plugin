@@ -71,5 +71,14 @@
   "peerDependencies": {
     "@zilliqa-js/zilliqa": "^3.4.3",
     "hardhat": "^2.18.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "cross-fetch@<2.2.6": ">=2.2.6",
+      "tar@<3.2.2": ">=3.2.2",
+      "node-fetch@<2.6.7": ">=2.6.7",
+      "tar@<4.4.18": ">=4.4.18",
+      "protobufjs@>=6.10.0 <6.11.4": ">=6.11.4"
+    }
   }
 }
