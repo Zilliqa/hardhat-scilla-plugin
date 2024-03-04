@@ -1,10 +1,8 @@
-import { execSync } from "child_process";
 import clc from "cli-color";
-import { glob } from "glob";
 import { task } from "hardhat/config";
 
-import { updateContractsInfo as updateScillaContractsInfo } from "./ScillaContractsInfoUpdater";
 import { runScillaChecker } from "./ScillaChecker";
+import { updateContractsInfo as updateScillaContractsInfo } from "./ScillaContractsInfoUpdater";
 
 task(
   "scilla-check",
@@ -16,7 +14,7 @@ task(
     "An optional list of files to check",
     []
   )
-  .setAction(async (taskArgs, hre, runSuper) => {
+  .setAction(async (taskArgs, _hre, _runSuper) => {
     await runScillaChecker(taskArgs.contracts, taskArgs.libdir)
   });
 

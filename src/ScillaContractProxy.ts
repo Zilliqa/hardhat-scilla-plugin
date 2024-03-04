@@ -1,17 +1,14 @@
 // Routines to construct proxies for Scilla contracts.
-import { Account, Transaction } from "@zilliqa-js/account";
-import { CallParams, Contract, Init, State } from "@zilliqa-js/contract";
-import { BN, bytes, Long, units } from "@zilliqa-js/util";
-import { Zilliqa } from "@zilliqa-js/zilliqa";
-import fs from "fs";
+import { Account } from "@zilliqa-js/account";
+import { CallParams, State } from "@zilliqa-js/contract";
+import { BN } from "@zilliqa-js/util";
 import { HardhatPluginError } from "hardhat/plugins";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
+
 import * as ScillaContractDeployer from './ScillaContractDeployer';
 import { ScillaContract, Value, Setup } from './ScillaContractDeployer';
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
 import {
   Field,
-  Fields,
   generateTypeConstructors,
   isNumeric,
   TransitionParam,
@@ -31,8 +28,8 @@ function handleParam(param: Field, arg: any): Value {
     };
   } else {
     const values: Value[] = [];
-    param.typeJSON.argtypes.forEach((param: Field, index: number) => {
-      values.push(handleUnnamedParam(param, arg[index]));
+    param.typeJSON.argtypes.forEach((p: Field, index: number) => {
+      values.push(handleUnnamedParam(p, arg[index]));
     });
     const argtypes = param.typeJSON.argtypes.map((x) => x.type);
     /*
@@ -66,8 +63,8 @@ function handleUnnamedParam(param: Field, arg: any): Value {
     return arg.toString();
   } else {
     const values: Value[] = [];
-    param.typeJSON.argtypes.forEach((param: Field, index: number) => {
-      values.push(handleUnnamedParam(param, arg[index]));
+    param.typeJSON.argtypes.forEach((f: Field, index: number) => {
+      values.push(handleUnnamedParam(f, arg[index]));
     });
     const argtypes = param.typeJSON.argtypes.map((x) => x.type);
     /*
@@ -169,9 +166,8 @@ export async function sc_call(
   args: Value[] = [],
   callParams: CallParams
 ) {
-  let setup = ScillaContractDeployer.setup;
 
-  if (setup === null) { 
+  if (ScillaContractDeployer.setup === null) { 
    throw new HardhatPluginError(
       "hardhat-scilla-plugin",
       "Please call initZilliqa function."
@@ -186,8 +182,8 @@ export async function sc_call(
     transition,
     args,
     callParams,
-    setup.attempts,
-    setup.timeout,
+    ScillaContractDeployer.setup.attempts,
+    ScillaContractDeployer.setup.timeout,
     true
 );
 }

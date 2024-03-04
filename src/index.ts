@@ -12,8 +12,8 @@ import {
   updateSetup,
   setAccount
 } from "./ScillaContractDeployer";
-import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
 import { contractFromAddress } from "./ScillaContractInteractor";
+import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
 import "./task-extensions";
 // This import is needed to let the TypeScript compiler know that it should include your type
 // extensions in your npm package's types file.
@@ -90,9 +90,7 @@ extendEnvironment((hre) => {
 
   hre.zilliqa = lazyObject(() => loadZilliqaHardhatObject(hre));
   hre.getZilliqaChainId = lazyFunction(
-    () => (): number => {
-      return (hre as any).network.config.chainId! & 0x7fff;
-    });
+    () => (): number => (hre as any).network.config.chainId! & 0x7fff);
   hre.getNetworkUrl = lazyFunction(
     () => (): string =>  {
       return (hre as any).network.config.url;

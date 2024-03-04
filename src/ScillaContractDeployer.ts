@@ -1,20 +1,19 @@
 // This is necessary so that tsc can resolve some of the indirect types for
 // sc_call, otherwise it errors out - richard@zilliqa.com 2023-03-09
 import { Account, Transaction } from "@zilliqa-js/account";
-import { CallParams, Contract, Init, State } from "@zilliqa-js/contract";
+import { Contract, Init } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import fs from "fs";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+
 import * as ScillaContractProxy from "./ScillaContractProxy";
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
 import {
   Field,
   Fields,
-  generateTypeConstructors,
   isNumeric,
-  TransitionParam,
 } from "./ScillaParser";
 
 
@@ -22,11 +21,6 @@ export interface Value {
   vname: string;
   type: string;
   value: string;
-}
-interface ADTValue {
-  constructor: string;
-  argtypes: string[];
-  arguments: Array<string | ADTValue>;
 }
 
 export interface Setup {
@@ -84,7 +78,7 @@ export function updateSetup(args: any) {
   if (setup === null) {
     throw new HardhatPluginError("hardhat-scilla-plugin", "Please call the initZilliqa function.");
   }
-  let overrides : any = { }
+  const overrides : any = { }
   if (args.gasPrice) {
     overrides.gasPrice =  units.toQa(args.gasPrice.toString(), units.Units.Li);
   }
@@ -97,7 +91,7 @@ export function updateSetup(args: any) {
   if (args.attempts) {
     overrides.attempts = args.attempts;
   }
-  let newSetup : Setup = { ...setup, ... overrides };
+  const newSetup : Setup = { ...setup, ... overrides };
   setup = newSetup;
 }
 
@@ -145,8 +139,6 @@ export async function deploy(
     throw new Error(`Scilla contract ${contractName} doesn't exist.`);
   }
 
-  let sc: ScillaContract;
-  let tx: Transaction;
   let txParamsForContractDeployment = {};
   if (contractInfo.parsedContract.constructorParams && args.length === contractInfo.parsedContract.constructorParams.length + 1) {
     // The last param is Tx info such as amount, nonce, gasPrice
@@ -160,7 +152,7 @@ export async function deploy(
     ...args
   );
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init, txParamsForContractDeployment);
+  const [tx, sc] = await deployFromFile(contractInfo.path, init, txParamsForContractDeployment);
   sc.deployed_by = tx;
 
   ScillaContractProxy.injectProxies(setup!, contractInfo, sc);
@@ -177,11 +169,9 @@ export const deployLibrary = async (
     throw new Error(`Scilla contract ${libraryName} doesn't exist.`);
   }
 
-  let sc: ScillaContract;
-  let tx: Transaction;
   const init: Init = fillLibraryInit();
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init, {});   // FIXME: In  #45
+  const [tx, sc] = await deployFromFile(contractInfo.path, init, {});   // FIXME: In  #45
   sc.deployed_by = tx;
 
   return sc;
