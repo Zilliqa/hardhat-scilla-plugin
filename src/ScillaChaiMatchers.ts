@@ -33,6 +33,7 @@ export const scillaChaiEventMatcher = function (
     const tx: Transaction = this._obj;
 
     const receipt = tx.getReceipt()!;
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     new Assertion(receipt.event_logs).not.to.be.null;
 
     const event_logs = receipt.event_logs!;
@@ -42,14 +43,14 @@ export const scillaChaiEventMatcher = function (
     );
   });
 
-  Assertion.addMethod("eventLogWithParams", function (
+  Assertion.addMethod("eventLogWithParams", async function (
     eventName: string,
     ...params: EventParam[]
   ) {
     const tx: Transaction = this._obj;
 
     const receipt = tx.getReceipt()!;
-    new Assertion(this._obj).to.eventLog(eventName);
+    await new Assertion(this._obj).to.eventLog(eventName);
 
     const event_logs = simplifyLogs(receipt.event_logs!);
     const desiredLog = event_logs.filter(

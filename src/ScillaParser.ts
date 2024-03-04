@@ -92,7 +92,7 @@ export const parseScillaLibrary = async (
   }
 
   return {
-    name: libraryName,
+    name: libraryName || "",
     transitions: [],
     fields: [],
     constructorParams: [],

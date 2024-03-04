@@ -3,6 +3,7 @@ import { Account } from "@zilliqa-js/account";
 import { CallParams, State } from "@zilliqa-js/contract";
 import { BN } from "@zilliqa-js/util";
 import { HardhatPluginError } from "hardhat/plugins";
+
 import * as ScillaContractDeployer from './ScillaContractDeployer';
 import { ScillaContract, Value, Setup } from './ScillaContractDeployer';
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
@@ -62,8 +63,8 @@ function handleUnnamedParam(param: Field, arg: any): Value {
     return arg.toString();
   } else {
     const values: Value[] = [];
-    param.typeJSON.argtypes.forEach((param: Field, index: number) => {
-      values.push(handleUnnamedParam(param, arg[index]));
+    param.typeJSON.argtypes.forEach((f: Field, index: number) => {
+      values.push(handleUnnamedParam(f, arg[index]));
     });
     const argtypes = param.typeJSON.argtypes.map((x) => x.type);
     /*

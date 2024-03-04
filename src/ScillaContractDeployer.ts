@@ -139,8 +139,6 @@ export async function deploy(
     throw new Error(`Scilla contract ${contractName} doesn't exist.`);
   }
 
-  let sc: ScillaContract;
-  let tx: Transaction;
   let txParamsForContractDeployment = {};
   if (contractInfo.parsedContract.constructorParams && args.length === contractInfo.parsedContract.constructorParams.length + 1) {
     // The last param is Tx info such as amount, nonce, gasPrice
@@ -154,7 +152,7 @@ export async function deploy(
     ...args
   );
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init, txParamsForContractDeployment);
+  const [tx, sc] = await deployFromFile(contractInfo.path, init, txParamsForContractDeployment);
   sc.deployed_by = tx;
 
   ScillaContractProxy.injectProxies(setup!, contractInfo, sc);
@@ -171,11 +169,9 @@ export const deployLibrary = async (
     throw new Error(`Scilla contract ${libraryName} doesn't exist.`);
   }
 
-  let sc: ScillaContract;
-  let tx: Transaction;
   const init: Init = fillLibraryInit();
 
-  [tx, sc] = await deployFromFile(contractInfo.path, init, {});   // FIXME: In  #45
+  const [tx, sc] = await deployFromFile(contractInfo.path, init, {});   // FIXME: In  #45
   sc.deployed_by = tx;
 
   return sc;

@@ -234,7 +234,6 @@ module.exports = {
         "max-len": "off",
         "new-parens": "off",
         "newline-per-chained-call": "off",
-        "no-bitwise": "error",
         "no-caller": "error",
         "no-cond-assign": "error",
         "no-console": "off",
