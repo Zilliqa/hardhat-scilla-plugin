@@ -25,10 +25,10 @@ declare global {
 }
 
 export const scillaChaiEventMatcher = function (
-  chai: Chai.ChaiStatic,
-  utils: Chai.ChaiUtils
+  static_chai: Chai.ChaiStatic,
+  _utils: Chai.ChaiUtils
 ) {
-  const Assertion = chai.Assertion;
+  const Assertion = static_chai.Assertion;
   Assertion.addMethod("eventLog", function (eventName: string) {
     const tx: Transaction = this._obj;
 

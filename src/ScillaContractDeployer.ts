@@ -1,20 +1,19 @@
 // This is necessary so that tsc can resolve some of the indirect types for
 // sc_call, otherwise it errors out - richard@zilliqa.com 2023-03-09
 import { Account, Transaction } from "@zilliqa-js/account";
-import { CallParams, Contract, Init, State } from "@zilliqa-js/contract";
+import { Contract, Init } from "@zilliqa-js/contract";
 import { BN, bytes, Long, units } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import fs from "fs";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+
 import * as ScillaContractProxy from "./ScillaContractProxy";
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
 import {
   Field,
   Fields,
-  generateTypeConstructors,
   isNumeric,
-  TransitionParam,
 } from "./ScillaParser";
 
 
@@ -22,11 +21,6 @@ export interface Value {
   vname: string;
   type: string;
   value: string;
-}
-interface ADTValue {
-  constructor: string;
-  argtypes: string[];
-  arguments: Array<string | ADTValue>;
 }
 
 export interface Setup {
@@ -84,7 +78,7 @@ export function updateSetup(args: any) {
   if (setup === null) {
     throw new HardhatPluginError("hardhat-scilla-plugin", "Please call the initZilliqa function.");
   }
-  let overrides : any = { }
+  const overrides : any = { }
   if (args.gasPrice) {
     overrides.gasPrice =  units.toQa(args.gasPrice.toString(), units.Units.Li);
   }
@@ -97,7 +91,7 @@ export function updateSetup(args: any) {
   if (args.attempts) {
     overrides.attempts = args.attempts;
   }
-  let newSetup : Setup = { ...setup, ... overrides };
+  const newSetup : Setup = { ...setup, ... overrides };
   setup = newSetup;
 }
 

@@ -1,10 +1,13 @@
-const parse: any = require("s-expression");
 import { execSync } from "child_process";
-import * as ZilliqaUtils from "./ZilliqaUtils";
 import fs from "fs";
-import path from "path";
 import { HardhatPluginError } from "hardhat/plugins";
-const readline = require("readline");
+import path from "path";
+import readline from "readline";
+
+import * as ZilliqaUtils from "./ZilliqaUtils";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const parse: any = require("s-expression");
 
 export const isNumeric = (type: string | ADTField) => {
   if (typeof type === "string") {
@@ -103,7 +106,7 @@ export const parseScilla = (filename: string): ParsedContract => {
     throw new Error(`${resolvedFilename} doesn't exist.`);
   }
 
-  let sexp = undefined;
+  let sexp;
   if (ZilliqaUtils.useNativeScilla()) {
      sexp = execSync(`scilla-fmt --sexp --human-readable ${filename}`);
   } else {
@@ -248,9 +251,9 @@ const extractTransitions = (ccompsElem: any[]): Transitions => {
       throw new Error(`Index 0 is not comp_params: ${compParamsData}`);
     }
 
-    const compParams = compParamsData[1].map((row: any[][][]) => {
-      const param = parseField(row[1]);
-      param.name = row[0][1][1];
+    const compParams = compParamsData[1].map((r: any[][][]) => {
+      const param = parseField(r[1]);
+      param.name = r[0][1][1];
       return param;
     });
     return {

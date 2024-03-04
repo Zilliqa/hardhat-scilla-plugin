@@ -1,8 +1,8 @@
 import { Transaction } from "@zilliqa-js/account";
 import { TransactionError } from "@zilliqa-js/core";
-import path from 'path';
 import fs from 'fs';
 import os from 'os';
+import path from 'path';
 
 interface ErrorDict {
   [index: string]: TransactionError[];
@@ -10,8 +10,8 @@ interface ErrorDict {
 
 /** Create a temporary file and return its name */
 export function createTemporaryFile(prefix: string, extension: string) : string {
-  let tempDir = os.tmpdir();
-  let dirName = fs.mkdtempSync(`${tempDir}/${prefix}`);
+  const tempDir = os.tmpdir();
+  const dirName = fs.mkdtempSync(`${tempDir}/${prefix}`);
 
   return `${dirName}/temp${prefix}.${extension}`
 }
@@ -19,7 +19,7 @@ export function createTemporaryFile(prefix: string, extension: string) : string 
 /** Delete the temporary file and its directory */
 export function deleteTemporaryFile(fileName: string) {
   // Find the parent directory
-  var parent = path.dirname(fileName);
+  const parent = path.dirname(fileName);
   // console.log(`Would delete ${parent}`);
   fs.rmSync(parent, { recursive: true, force: true });
 }

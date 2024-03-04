@@ -1,12 +1,11 @@
-import { Account, Transaction, TxParams, Wallet } from "@zilliqa-js/account";
+import { Account, Transaction, TxParams } from "@zilliqa-js/account";
 import * as zcrypto from "@zilliqa-js/crypto";
-import { BN, bytes, Long, units } from "@zilliqa-js/util";
+import { BN } from "@zilliqa-js/util";
 import { Zilliqa } from "@zilliqa-js/zilliqa";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import * as ScillaContractDeployer from "./ScillaContractDeployer";
-import { getEventLog } from "./ZilliqaUtils";
 
 // We carefully don't cache the setup object, in case it changes underneath us.
 export class ZilliqaHardhatObject {
@@ -30,8 +29,8 @@ export class ZilliqaHardhatObject {
 
   // Retrieve the default acount used to sign transactions.
   public getDefaultAccount(): Account | undefined {
-    let wallet = this.getZilliqaSetup().zilliqa.wallet;
-    let defaultAccount = wallet.defaultAccount;
+    const wallet = this.getZilliqaSetup().zilliqa.wallet;
+    const defaultAccount = wallet.defaultAccount;
     return defaultAccount;
   }
 
@@ -76,11 +75,11 @@ export class ZilliqaHardhatObject {
     return tx
   }
 
-  public async getBalance(account: Account): Promise<[BN, Number]> {
+  public async getBalance(account: Account): Promise<[BN, number]> {
     return this.getBalanceForAddress(account.address);
   }
 
-  public async getBalanceForAddress(addressToQuery: string): Promise<[BN, Number]> {
+  public async getBalanceForAddress(addressToQuery: string): Promise<[BN, number]> {
     const rpc = await this.getZilliqaJSObject().blockchain.getBalance(
       addressToQuery
     );
@@ -100,7 +99,7 @@ export class ZilliqaHardhatObject {
 }
 
 export function loadZilliqaHardhatObject(
-  hre: HardhatRuntimeEnvironment
+  _hre: HardhatRuntimeEnvironment
 ): ZilliqaHardhatObject {
   return new ZilliqaHardhatObject();
 }
