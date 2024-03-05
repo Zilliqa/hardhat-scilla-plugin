@@ -5,7 +5,7 @@ import { Zilliqa } from "@zilliqa-js/zilliqa";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import * as ScillaContractDeployer from "./ScillaContractDeployer";
+import * as ScillaContractDeployer from "./deployer/ScillaContractDeployer";
 
 // We carefully don't cache the setup object, in case it changes underneath us.
 export class ZilliqaHardhatObject {

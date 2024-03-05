@@ -1,6 +1,6 @@
 import { BigNumber } from "@ethersproject/bignumber";
 
-import { isNumeric } from "./ScillaParser";
+import { isNumeric } from "../parser/ScillaParser";
 
 export const simplifyLogs = function (logs: any) {
   for (const log of logs) {

@@ -6,7 +6,7 @@ import {
   ParsedContract,
   parseScilla,
   parseScillaLibrary,
-} from "../src/ScillaParser";
+} from "./parser/ScillaParser";
 chai.use(chaiSubset);
 
 describe("", function () {

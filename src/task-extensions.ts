@@ -1,8 +1,8 @@
 import clc from "cli-color";
 import { task } from "hardhat/config";
 
-import { runScillaChecker } from "./ScillaChecker";
-import { updateContractsInfo as updateScillaContractsInfo } from "./ScillaContractsInfoUpdater";
+import { runScillaChecker } from "./hardhat-tasks/ScillaChecker";
+import { updateContractsInfo as updateScillaContractsInfo } from "./parser/ScillaContractsInfoUpdater";
 
 task(
   "scilla-check",

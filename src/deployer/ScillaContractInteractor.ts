@@ -2,13 +2,14 @@ import fs from "fs";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { ScillaContract } from "./ScillaContractDeployer";
+import * as ScillaContractProxy from "../parser/ScillaContractProxy";
+import { ContractInfo } from "../parser/ScillaContractsInfoUpdater";
+import * as ScillaContractsInfoUpdater from "../parser/ScillaContractsInfoUpdater";
+import { parseScilla } from "../parser/ScillaParser";
+import * as ZilliqaUtils from "../ZilliqaUtils";
+
 import * as ScillaContractDeployer from "./ScillaContractDeployer";
-import * as ScillaContractProxy from "./ScillaContractProxy";
-import { ContractInfo } from "./ScillaContractsInfoUpdater";
-import * as ScillaContractsInfoUpdater from "./ScillaContractsInfoUpdater";
-import { parseScilla } from "./ScillaParser";
-import * as ZilliqaUtils from "./ZilliqaUtils";
+import { ScillaContract } from "./ScillaContractDeployer";
 
 export async function contractFromAddress(
   hre: HardhatRuntimeEnvironment,

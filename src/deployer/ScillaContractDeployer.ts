@@ -8,9 +8,9 @@ import fs from "fs";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import * as ScillaContractProxy from "./ScillaContractProxy";
-import { ContractInfo } from "./ScillaContractsInfoUpdater";
-import { Field, Fields, isNumeric } from "./ScillaParser";
+import * as ScillaContractProxy from "../parser/ScillaContractProxy";
+import { ContractInfo } from "../parser/ScillaContractsInfoUpdater";
+import { Field, Fields, isNumeric } from "../parser/ScillaParser";
 
 export interface Value {
   vname: string;

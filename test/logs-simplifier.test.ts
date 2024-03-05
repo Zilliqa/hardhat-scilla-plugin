@@ -1,7 +1,7 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { expect } from "chai";
 
-import { simplifyLogs } from "../src/LogsSimplifier";
+import { simplifyLogs } from "./chai-matcher/LogsSimplifier";
 
 describe("", function () {
   describe("Logs simplifier", function () {

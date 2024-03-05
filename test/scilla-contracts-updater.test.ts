@@ -6,7 +6,7 @@ import {
   ContractInfo,
   loadScillaContractsInfo,
   updateContractsInfo,
-} from "../src/ScillaContractsInfoUpdater";
+} from "./parser/ScillaContractsInfoUpdater";
 chai.use(chaiSubset);
 
 describe("", function () {

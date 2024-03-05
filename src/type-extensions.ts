@@ -6,8 +6,11 @@ import { Init } from "@zilliqa-js/contract";
 import "hardhat/types/config";
 import "hardhat/types/runtime";
 
-import { ScillaContract, UserDefinedLibrary } from "./ScillaContractDeployer";
-import { ScillaContracts } from "./ScillaContractsInfoUpdater";
+import {
+  ScillaContract,
+  UserDefinedLibrary,
+} from "./deployer/ScillaContractDeployer";
+import { ScillaContracts } from "./parser/ScillaContractsInfoUpdater";
 // Called ZilliqaHardhatObject to distinguish it from @zilliqa-js/zilliqa:Zilliqa
 import { ZilliqaHardhatObject } from "./ZilliqaHardhatObject";
 

@@ -4,7 +4,7 @@ import { HardhatPluginError } from "hardhat/plugins";
 import path from "path";
 import readline from "readline";
 
-import * as ZilliqaUtils from "./ZilliqaUtils";
+import * as ZilliqaUtils from "../ZilliqaUtils";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const parse: any = require("s-expression");

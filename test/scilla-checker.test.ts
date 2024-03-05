@@ -1,7 +1,7 @@
 import chai from "chai";
 import chaiSubset from "chai-subset";
 
-import { runScillaChecker } from "../src/ScillaChecker";
+import { runScillaChecker } from "./hardhat-tasks/ScillaChecker";
 chai.use(chaiSubset);
 
 describe("", function () {

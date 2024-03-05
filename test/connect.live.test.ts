@@ -1,7 +1,6 @@
 import chai, { expect } from "chai";
 
-import { scillaChaiEventMatcher } from "../src/ScillaChaiMatchers";
-
+import { scillaChaiEventMatcher } from "./chai-matcher/ScillaChaiMatchers";
 import { useEnvironment } from "./helpers";
 
 chai.use(scillaChaiEventMatcher);

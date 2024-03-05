@@ -2,9 +2,10 @@ import { resetHardhatContext } from "hardhat/plugins-testing";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import path from "path";
 
-import { initZilliqa } from "../src/ScillaContractDeployer";
-import { updateContractsInfo } from "../src/ScillaContractsInfoUpdater";
 import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
+
+import { initZilliqa } from "./deployer/ScillaContractDeployer";
+import { updateContractsInfo } from "./parser/ScillaContractsInfoUpdater";
 
 declare module "mocha" {
   interface Context {

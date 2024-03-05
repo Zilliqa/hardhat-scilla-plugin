@@ -11,9 +11,9 @@ import {
   UserDefinedLibrary,
   updateSetup,
   setAccount,
-} from "./ScillaContractDeployer";
-import { contractFromAddress } from "./ScillaContractInteractor";
-import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
+} from "./deployer/ScillaContractDeployer";
+import { contractFromAddress } from "./deployer/ScillaContractInteractor";
+import { loadScillaContractsInfo } from "./parser/ScillaContractsInfoUpdater";
 import "./task-extensions";
 // This import is needed to let the TypeScript compiler know that it should include your type
 // extensions in your npm package's types file.
@@ -25,11 +25,11 @@ export {
   Setup,
   initZilliqa,
   UserDefinedLibrary,
-} from "./ScillaContractDeployer";
+} from "./deployer/ScillaContractDeployer";
 export { ZilliqaHardhatObject } from "./ZilliqaHardhatObject";
 export { BN } from "@zilliqa-js/util";
 
-export { scillaChaiEventMatcher } from "./ScillaChaiMatchers";
+export { scillaChaiEventMatcher } from "./chai-matcher/ScillaChaiMatchers";
 
 extendEnvironment((hre) => {
   // We add a field to the Hardhat Runtime Environment here.
