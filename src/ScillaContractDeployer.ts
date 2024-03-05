@@ -10,12 +10,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import * as ScillaContractProxy from "./ScillaContractProxy";
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
-import {
-  Field,
-  Fields,
-  isNumeric,
-} from "./ScillaParser";
-
+import { Field, Fields, isNumeric } from "./ScillaParser";
 
 export interface Value {
   vname: string;
@@ -32,7 +27,6 @@ export interface Setup {
   readonly gasLimit: Long;
   accounts: Account[];
 }
-
 
 export let setup: Setup | null = null;
 
@@ -76,11 +70,14 @@ function read(f: string) {
 /// gasPrice, gasLimit, attempts, timeout.
 export function updateSetup(args: any) {
   if (setup === null) {
-    throw new HardhatPluginError("hardhat-scilla-plugin", "Please call the initZilliqa function.");
+    throw new HardhatPluginError(
+      "hardhat-scilla-plugin",
+      "Please call the initZilliqa function."
+    );
   }
-  const overrides : any = { }
+  const overrides: any = {};
   if (args.gasPrice) {
-    overrides.gasPrice =  units.toQa(args.gasPrice.toString(), units.Units.Li);
+    overrides.gasPrice = units.toQa(args.gasPrice.toString(), units.Units.Li);
   }
   if (args.gasLimit) {
     overrides.gasLimit = Long.fromNumber(args.gasLimit);
@@ -91,7 +88,7 @@ export function updateSetup(args: any) {
   if (args.attempts) {
     overrides.attempts = args.attempts;
   }
-  const newSetup : Setup = { ...setup, ... overrides };
+  const newSetup: Setup = { ...setup, ...overrides };
   setup = newSetup;
 }
 
@@ -133,14 +130,18 @@ export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
   userDefinedLibraries: OptionalUserDefinedLibraryList,
-  ...args: any[]): Promise<ScillaContract> {
+  ...args: any[]
+): Promise<ScillaContract> {
   const contractInfo: ContractInfo = hre.scillaContracts[contractName];
   if (contractInfo === undefined) {
     throw new Error(`Scilla contract ${contractName} doesn't exist.`);
   }
 
   let txParamsForContractDeployment = {};
-  if (contractInfo.parsedContract.constructorParams && args.length === contractInfo.parsedContract.constructorParams.length + 1) {
+  if (
+    contractInfo.parsedContract.constructorParams &&
+    args.length === contractInfo.parsedContract.constructorParams.length + 1
+  ) {
     // The last param is Tx info such as amount, nonce, gasPrice
     txParamsForContractDeployment = args.pop();
   }
@@ -152,7 +153,11 @@ export async function deploy(
     ...args
   );
 
-  const [tx, sc] = await deployFromFile(contractInfo.path, init, txParamsForContractDeployment);
+  const [tx, sc] = await deployFromFile(
+    contractInfo.path,
+    init,
+    txParamsForContractDeployment
+  );
   sc.deployed_by = tx;
 
   ScillaContractProxy.injectProxies(setup!, contractInfo, sc);
@@ -162,7 +167,7 @@ export async function deploy(
 
 export const deployLibrary = async (
   hre: HardhatRuntimeEnvironment,
-  libraryName: string,
+  libraryName: string
 ): Promise<ScillaContract> => {
   const contractInfo: ContractInfo = hre.scillaContracts[libraryName];
   if (contractInfo === undefined) {
@@ -171,7 +176,7 @@ export const deployLibrary = async (
 
   const init: Init = fillLibraryInit();
 
-  const [tx, sc] = await deployFromFile(contractInfo.path, init, {});   // FIXME: In  #45
+  const [tx, sc] = await deployFromFile(contractInfo.path, init, {}); // FIXME: In  #45
   sc.deployed_by = tx;
 
   return sc;
@@ -232,7 +237,8 @@ const fillInit = (
           type: param.type,
           value: userSpecifiedArgs[index].toString(),
         });
-      } else {    // It's an ADT or string
+      } else {
+        // It's an ADT or string
         init.push({
           vname: param.name,
           type: param.type,

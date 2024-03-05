@@ -10,7 +10,7 @@ import {
   ScillaContract,
   UserDefinedLibrary,
   updateSetup,
-  setAccount
+  setAccount,
 } from "./ScillaContractDeployer";
 import { contractFromAddress } from "./ScillaContractInteractor";
 import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
@@ -26,12 +26,8 @@ export {
   initZilliqa,
   UserDefinedLibrary,
 } from "./ScillaContractDeployer";
-export {
-  ZilliqaHardhatObject
-} from "./ZilliqaHardhatObject";
-export {
-  BN
-} from "@zilliqa-js/util";
+export { ZilliqaHardhatObject } from "./ZilliqaHardhatObject";
+export { BN } from "@zilliqa-js/util";
 
 export { scillaChaiEventMatcher } from "./ScillaChaiMatchers";
 
@@ -40,67 +36,66 @@ extendEnvironment((hre) => {
   // We use lazyObject to avoid initializing things until they are actually
   // needed.
   hre.scillaContracts = lazyObject(() => loadScillaContractsInfo());
-  hre.setScillaDefaults = lazyFunction(
-    () => (params) => {
-      return updateSetup(params);
-    }
-  );
+  hre.setScillaDefaults = lazyFunction(() => (params) => {
+    return updateSetup(params);
+  });
 
   hre.interactWithScillaContract = lazyFunction(
-    () => async(
-      contractAddress: string
-    ) : Promise<ScillaContract | undefined> => {
-      return contractFromAddress(hre, contractAddress);
-    }
+    () =>
+      async (contractAddress: string): Promise<ScillaContract | undefined> => {
+        return contractFromAddress(hre, contractAddress);
+      }
   );
 
   hre.deployScillaContract = lazyFunction(
-    () => async (
-      contractName: string,
-      ...args: any[]
-    ): Promise<ScillaContract> => {
-      return deploy(hre, contractName, [], ...args);
-    }
+    () =>
+      async (contractName: string, ...args: any[]): Promise<ScillaContract> => {
+        return deploy(hre, contractName, [], ...args);
+      }
   );
 
   hre.deployScillaContractWithLib = lazyFunction(
-    () => async (
-      contractName: string,
-      userDefinedLibraries: UserDefinedLibrary[],
-      ...args: any[]
-    ): Promise<ScillaContract> => {
-      return deploy(hre, contractName, userDefinedLibraries, ...args);
-    }
+    () =>
+      async (
+        contractName: string,
+        userDefinedLibraries: UserDefinedLibrary[],
+        ...args: any[]
+      ): Promise<ScillaContract> => {
+        return deploy(hre, contractName, userDefinedLibraries, ...args);
+      }
   );
 
   hre.deployScillaLibrary = lazyFunction(
-    () => async (libraryName: string): Promise<ScillaContract> => {
-      return deployLibrary(hre, libraryName);
-    }
+    () =>
+      async (libraryName: string): Promise<ScillaContract> => {
+        return deployLibrary(hre, libraryName);
+      }
   );
 
   hre.deployScillaFile = lazyFunction(
-    () => async (
-      contractPath: string,
-      init: Init,
-    ): Promise<[Transaction, ScillaContract]> => {
-      return deployFromFile(contractPath, init, {});
-    }
+    () =>
+      async (
+        contractPath: string,
+        init: Init
+      ): Promise<[Transaction, ScillaContract]> => {
+        return deployFromFile(contractPath, init, {});
+      }
   );
 
   hre.zilliqa = lazyObject(() => loadZilliqaHardhatObject(hre));
   hre.getZilliqaChainId = lazyFunction(
-    () => (): number => (hre as any).network.config.chainId! & 0x7fff);
-  hre.getNetworkUrl = lazyFunction(
-    () => (): string =>  {
-      return (hre as any).network.config.url;
-    });
-  hre.getPrivateKeys = lazyFunction(
-    () => (): string[] => {
-      return (hre as any).network.config.accounts;
-    });
+    () => (): number => (hre as any).network.config.chainId! & 0x7fff
+  );
+  hre.getNetworkUrl = lazyFunction(() => (): string => {
+    return (hre as any).network.config.url;
+  });
+  hre.getPrivateKeys = lazyFunction(() => (): string[] => {
+    return (hre as any).network.config.accounts;
+  });
   hre.setActiveAccount = lazyFunction(
-    () => (indexOrAccount: number | Account) : void => {
-      setAccount(indexOrAccount);
-    });
+    () =>
+      (indexOrAccount: number | Account): void => {
+        setAccount(indexOrAccount);
+      }
+  );
 });

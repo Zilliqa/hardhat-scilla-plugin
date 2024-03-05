@@ -4,8 +4,8 @@ import { CallParams, State } from "@zilliqa-js/contract";
 import { BN } from "@zilliqa-js/util";
 import { HardhatPluginError } from "hardhat/plugins";
 
-import * as ScillaContractDeployer from './ScillaContractDeployer';
-import { ScillaContract, Value, Setup } from './ScillaContractDeployer';
+import * as ScillaContractDeployer from "./ScillaContractDeployer";
+import { ScillaContract, Value, Setup } from "./ScillaContractDeployer";
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
 import {
   Field,
@@ -90,16 +90,24 @@ export function injectConnectors(setup: Setup, sc: ScillaContract) {
     sc.executer = signer;
 
     // If account is not added already, add it to the list.
-    if (setup?.accounts.findIndex((acc) => acc.privateKey === signer.privateKey) === -1) {
+    if (
+      setup?.accounts.findIndex(
+        (acc) => acc.privateKey === signer.privateKey
+      ) === -1
+    ) {
       setup?.zilliqa.wallet.addByPrivateKey(signer.privateKey);
       setup?.accounts.push(signer);
     }
     return sc;
-  }
+  };
 }
 
-// Inject proxy functions into a contract. 
-export function injectProxies(setup: Setup, contractInfo: ContractInfo, sc: ScillaContract) {
+// Inject proxy functions into a contract.
+export function injectProxies(
+  setup: Setup,
+  contractInfo: ContractInfo,
+  sc: ScillaContract
+) {
   contractInfo.parsedContract.transitions.forEach((transition) => {
     sc[transition.name] = async (...args: any[]) => {
       let callParams: CallParams = {
@@ -166,9 +174,8 @@ export async function sc_call(
   args: Value[] = [],
   callParams: CallParams
 ) {
-
-  if (ScillaContractDeployer.setup === null) { 
-   throw new HardhatPluginError(
+  if (ScillaContractDeployer.setup === null) {
+    throw new HardhatPluginError(
       "hardhat-scilla-plugin",
       "Please call initZilliqa function."
     );
@@ -185,5 +192,5 @@ export async function sc_call(
     ScillaContractDeployer.setup.attempts,
     ScillaContractDeployer.setup.timeout,
     true
-);
+  );
 }

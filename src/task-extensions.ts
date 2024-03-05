@@ -15,7 +15,7 @@ task(
     []
   )
   .setAction(async (taskArgs, _hre, _runSuper) => {
-    await runScillaChecker(taskArgs.contracts, taskArgs.libdir)
+    await runScillaChecker(taskArgs.contracts, taskArgs.libdir);
   });
 
 task("compile").setAction(async (taskArgs, hre, runSuper) => {
