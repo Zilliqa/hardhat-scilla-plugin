@@ -101,16 +101,18 @@ export const parseScillaLibrary = async (
 };
 
 export const parseScilla = (filename: string): ParsedContract => {
-  const resolvedFilename = path.resolve(filename)
+  const resolvedFilename = path.resolve(filename);
   if (!fs.existsSync(resolvedFilename)) {
     throw new Error(`${resolvedFilename} doesn't exist.`);
   }
 
   let sexp;
   if (ZilliqaUtils.useNativeScilla()) {
-     sexp = execSync(`scilla-fmt --sexp --human-readable ${filename}`);
+    sexp = execSync(`scilla-fmt --sexp --human-readable ${filename}`);
   } else {
-     sexp = execSync(`docker run --rm -v ${resolvedFilename}:/tmp/input.scilla -i zilliqa/scilla:v0.13.3 /scilla/0/bin/scilla-fmt --sexp --human-readable /tmp/input.scilla`);
+    sexp = execSync(
+      `docker run --rm -v ${resolvedFilename}:/tmp/input.scilla -i zilliqa/scilla:v0.13.3 /scilla/0/bin/scilla-fmt --sexp --human-readable /tmp/input.scilla`
+    );
   }
   const result: any[] = parse(sexp.toString());
 
@@ -184,47 +186,46 @@ const extractContractParams = (contrElem: any[]): Fields | null => {
 };
 
 const extractContractFields = (cfieldsElem: any[]): Fields => {
-  return cfieldsElem.map(
-    (row: any[]): Field => {
-      const identData = row[0];
-      if (identData[0] !== "Ident") {
-        throw new Error(`Index 0 is not Ident: ${identData}`);
-      }
-
-      const fieldNameData = identData[1];
-      if (fieldNameData[0] !== "SimpleLocal") {
-        throw new Error(`Index 0 is not SimpleLocal: ${fieldNameData}`);
-      }
-
-      const fieldTypeData = row[1];
-      // Currently we just parse PrimType, for the rest we don't parse it completely.
-      if (fieldTypeData[0] === "PrimType") {
-        return {
-          type: fieldTypeData[1],
-          name: fieldNameData[1],
-        };
-      } else if (fieldTypeData[0] === "ADT") {
-        const adt = parseAdt(fieldTypeData);
-        return {
-          typeJSON: adt,
-          type: adt.ctor + adt.argtypes.map((arg: Field) => " " + arg.type).join(" "),
-          name: fieldNameData[1],
-        };
-      } else if (fieldTypeData[0] === "MapType") {
-        return {
-          type: "Map",
-          name: fieldNameData[1],
-        };
-      } else if (fieldTypeData[0] === "Address") {
-        return {
-          type: "Address",
-          name: fieldNameData[1],
-        };
-      } else {
-        throw new Error(`Data type is unknown: ${fieldTypeData}`);
-      }
+  return cfieldsElem.map((row: any[]): Field => {
+    const identData = row[0];
+    if (identData[0] !== "Ident") {
+      throw new Error(`Index 0 is not Ident: ${identData}`);
     }
-  );
+
+    const fieldNameData = identData[1];
+    if (fieldNameData[0] !== "SimpleLocal") {
+      throw new Error(`Index 0 is not SimpleLocal: ${fieldNameData}`);
+    }
+
+    const fieldTypeData = row[1];
+    // Currently we just parse PrimType, for the rest we don't parse it completely.
+    if (fieldTypeData[0] === "PrimType") {
+      return {
+        type: fieldTypeData[1],
+        name: fieldNameData[1],
+      };
+    } else if (fieldTypeData[0] === "ADT") {
+      const adt = parseAdt(fieldTypeData);
+      return {
+        typeJSON: adt,
+        type:
+          adt.ctor + adt.argtypes.map((arg: Field) => " " + arg.type).join(" "),
+        name: fieldNameData[1],
+      };
+    } else if (fieldTypeData[0] === "MapType") {
+      return {
+        type: "Map",
+        name: fieldNameData[1],
+      };
+    } else if (fieldTypeData[0] === "Address") {
+      return {
+        type: "Address",
+        name: fieldNameData[1],
+      };
+    } else {
+      throw new Error(`Data type is unknown: ${fieldTypeData}`);
+    }
+  });
 };
 
 const extractTransitions = (ccompsElem: any[]): Transitions => {
@@ -278,14 +279,14 @@ function generateAdtType(field: ADTField): string {
     return field.ctor;
   }
 
-  const type = `${field.ctor} ${field.argtypes.map((arg: Field) =>{
-    // Here we're sure that type is ADTField
-    const typeJson: ADTField = arg.typeJSON as ADTField;
-    if (["Pair", "List"].includes(typeJson.ctor))
-      return `(${arg.type})`
-    else 
-      return arg.type
-  }).reduce((prev, current) => `${prev} ${current}`)}`;
+  const type = `${field.ctor} ${field.argtypes
+    .map((arg: Field) => {
+      // Here we're sure that type is ADTField
+      const typeJson: ADTField = arg.typeJSON as ADTField;
+      if (["Pair", "List"].includes(typeJson.ctor)) return `(${arg.type})`;
+      else return arg.type;
+    })
+    .reduce((prev, current) => `${prev} ${current}`)}`;
   return type;
 }
 

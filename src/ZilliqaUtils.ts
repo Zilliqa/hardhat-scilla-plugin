@@ -1,19 +1,19 @@
 import { Transaction } from "@zilliqa-js/account";
 import { TransactionError } from "@zilliqa-js/core";
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
+import fs from "fs";
+import os from "os";
+import path from "path";
 
 interface ErrorDict {
   [index: string]: TransactionError[];
 }
 
 /** Create a temporary file and return its name */
-export function createTemporaryFile(prefix: string, extension: string) : string {
+export function createTemporaryFile(prefix: string, extension: string): string {
   const tempDir = os.tmpdir();
   const dirName = fs.mkdtempSync(`${tempDir}/${prefix}`);
 
-  return `${dirName}/temp${prefix}.${extension}`
+  return `${dirName}/temp${prefix}.${extension}`;
 }
 
 /** Delete the temporary file and its directory */
@@ -24,10 +24,9 @@ export function deleteTemporaryFile(fileName: string) {
   fs.rmSync(parent, { recursive: true, force: true });
 }
 
-
 /** Should we use native scilla binaries? */
-export function useNativeScilla() : boolean {
-  return (process.env.USE_NATIVE_SCILLA !== undefined)
+export function useNativeScilla(): boolean {
+  return process.env.USE_NATIVE_SCILLA !== undefined;
 }
 
 /** Given a transaction, return a string[][] array containing a list of errors, decoded into their
@@ -72,4 +71,3 @@ export async function getEventLog(tx: Transaction): Promise<any> {
   const event_logs = receipt.event_logs!;
   return event_logs;
 }
-

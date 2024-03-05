@@ -43,20 +43,20 @@ export const scillaChaiEventMatcher = function (
     );
   });
 
-  Assertion.addMethod("eventLogWithParams", async function (
-    eventName: string,
-    ...params: EventParam[]
-  ) {
-    const tx: Transaction = this._obj;
+  Assertion.addMethod(
+    "eventLogWithParams",
+    async function (eventName: string, ...params: EventParam[]) {
+      const tx: Transaction = this._obj;
 
-    const receipt = tx.getReceipt()!;
-    await new Assertion(this._obj).to.eventLog(eventName);
+      const receipt = tx.getReceipt()!;
+      await new Assertion(this._obj).to.eventLog(eventName);
 
-    const event_logs = simplifyLogs(receipt.event_logs!);
-    const desiredLog = event_logs.filter(
-      (log: any) => log._eventname === eventName
-    );
+      const event_logs = simplifyLogs(receipt.event_logs!);
+      const desiredLog = event_logs.filter(
+        (log: any) => log._eventname === eventName
+      );
 
-    new Assertion(desiredLog[0].params).to.containSubset(params);
-  });
+      new Assertion(desiredLog[0].params).to.containSubset(params);
+    }
+  );
 };

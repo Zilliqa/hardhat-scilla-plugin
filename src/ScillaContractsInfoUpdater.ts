@@ -105,7 +105,6 @@ export const getFileHash = (fileName: string): string => {
   return hashSum.digest("hex");
 };
 
-
 const parseScillaFile = async (
   fileName: string
 ): Promise<ContractInfo | null> => {

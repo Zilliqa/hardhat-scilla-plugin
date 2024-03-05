@@ -16,8 +16,8 @@
     "zilliqa"
   ],
   "scripts": {
-    "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && eslint --fix -c .eslintrc.js --ext .ts src",
-    "lint": "eslint -c .eslintrc.js --ext .ts src",
+    "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && eslint --fix . --ext .ts --fix",
+    "lint": "eslint . --ext .ts",
     "test": "mocha --exit --recursive 'test/**/*.test.ts' --exclude 'test/**/*.live.test.ts'",
     "test-all": "mocha --exit --recursive 'test/**/*.test.ts'",
     "test-live": "mocha --exit --recursive 'test/**/*.live.test.ts'",
