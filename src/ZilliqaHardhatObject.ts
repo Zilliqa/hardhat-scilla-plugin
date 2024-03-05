@@ -27,7 +27,7 @@ export class ZilliqaHardhatObject {
     return this.getZilliqaSetup().accounts;
   }
 
-  // Retrieve the default acount used to sign transactions.
+  // Retrieve the default account used to sign transactions.
   public getDefaultAccount(): Account | undefined {
     const wallet = this.getZilliqaSetup().zilliqa.wallet;
     const defaultAccount = wallet.defaultAccount;

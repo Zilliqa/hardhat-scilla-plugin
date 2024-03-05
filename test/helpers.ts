@@ -17,7 +17,7 @@ export function useEnvironment(fixtureProjectName: string) {
   before("Loading hardhat environment", async function () {
     process.chdir(path.join(__dirname, "fixture-projects", fixtureProjectName));
     this.hre = require("hardhat");
-    await initZilliqa(
+    initZilliqa(
       process.env.ZILLIQA_API_URL || this.hre.getNetworkUrl(),
       this.hre.getZilliqaChainId(),
       this.hre.getPrivateKeys(),

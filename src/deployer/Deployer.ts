@@ -38,7 +38,7 @@ export class ContractDeployer {
     return this;
   }
 
-  withContractParams(params: any[]): ContractDeployer {
+  withContractParams(...params: any[]): ContractDeployer {
     this.contractParams = params;
     return this;
   }
@@ -59,7 +59,7 @@ export class ContractDeployer {
   }
 
   async deploy(): Promise<ScillaContract> {
-    if (!!this.contractName.trim()) {
+    if (this.contractName.trim().length === 0) {
       throw new HardhatPluginError(
         "hardhat-scilla-plugin",
         "You must specify the contract name in order to deploy it."
@@ -69,7 +69,13 @@ export class ContractDeployer {
       this.contractParams.push(this.txParams);
     }
 
-    const contract = deploy(this.hre, this.contractName, this.compress, this.userDefinedLibraries, ...this.contractParams);
+    const contract = deploy(
+      this.hre,
+      this.contractName,
+      this.compress,
+      this.userDefinedLibraries,
+      ...this.contractParams
+    );
     this.reset();
     return contract;
   }
