@@ -1,14 +1,15 @@
 import { BN } from "@zilliqa-js/util";
 import { expect } from "chai";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
+
 import { useEnvironment } from "./helpers"
 
 describe("", function () {
 
-  var hre : HardhatRuntimeEnvironment;
-  var zobj : ZilliqaHardhatObject.ZilliqaHardhatObject;
+  let hre : HardhatRuntimeEnvironment;
+  let zobj : ZilliqaHardhatObject.ZilliqaHardhatObject;
 
   useEnvironment("hardhat-project");
   this.timeout(500000);
@@ -38,9 +39,8 @@ describe("", function () {
       const privKey = this.zobj.createPrivateKey();
       const [acc,idx] = this.zobj.pushPrivateKey(privKey);
       const VAL = new BN("100000000000000001000");
-      const txn = await this.zobj.transferTo(acc, new BN(VAL));
+      await this.zobj.transferTo(acc, new BN(VAL));
       const [bal,nonce] = await this.zobj.getBalance(acc);
-      const transferredBalance = bal;
       expect(bal).to.exist;
       expect(bal.eq(new BN(VAL))).to.be.true;
       expect(nonce).to.not.be.eq(-1);
@@ -48,7 +48,7 @@ describe("", function () {
       this.hre.setActiveAccount(idx);
       // Lose 10 zil here for gas.
       const txn2 = await this.zobj.transferToAddress(this.zobj.getAccounts()[0].address, new BN(1_000));
-      expect(txn2['receipt']['success']).to.be.true;
+      expect(txn2.getReceipt()!.success).to.be.true;
       this.hre.setActiveAccount(0);
     });
   });

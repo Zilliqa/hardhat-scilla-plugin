@@ -317,13 +317,13 @@ module.exports = {
         "unicorn/prefer-ternary": "off",
         "use-isnan": "error",
         "valid-typeof": "off",
-        // "@typescript-eslint/tslint/config": [
-        //     "error",
-        //     {
-        //         "rules": {
-        //             "prettier": true
-        //         }
-        //     }
-        // ]
-    }
+    },
+    "overrides": [
+        {
+            "files": ["*.test.ts", "*.spec.ts"],
+            "rules": {
+                "@typescript-eslint/no-unused-expressions": "off",
+            }
+        }
+    ]
 };

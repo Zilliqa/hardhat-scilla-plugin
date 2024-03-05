@@ -1,20 +1,20 @@
 import { BN, Long } from "@zilliqa-js/util";
-import { expect } from "chai";
-
-import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
+import chai, { expect } from "chai";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { useEnvironment } from "./helpers"
 
-import chai from 'chai';
+
 import { scillaChaiEventMatcher } from '../src/ScillaChaiMatchers';
 import { setup } from '../src/ScillaContractDeployer';
+import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
+
+import { useEnvironment } from "./helpers"
 
 chai.use(scillaChaiEventMatcher);
 
 describe("", function () {
 
-  var hre : HardhatRuntimeEnvironment;
-  var zobj : ZilliqaHardhatObject.ZilliqaHardhatObject;
+  let hre : HardhatRuntimeEnvironment;
+  let zobj : ZilliqaHardhatObject.ZilliqaHardhatObject;
 
   useEnvironment("hardhat-project");
   describe("Contract deployment", function () {
@@ -26,7 +26,7 @@ describe("", function () {
       expect(setup!.gasLimit.equals(Long.fromNumber(100000))).to.be.true;
     });
     it("Should be possible to set partial overrides", async function () {
-      let oldTimeout = setup!.timeout;
+      const oldTimeout = setup!.timeout;
       this.hre.setScillaDefaults( { "attempts" : 52 } );
       expect(setup!.attempts).to.equal(52);
       expect(setup!.timeout).to.equal(oldTimeout);

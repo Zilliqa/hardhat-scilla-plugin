@@ -1,4 +1,4 @@
-import chai, { expect } from "chai";
+import chai from "chai";
 import chaiSubset from "chai-subset";
 
 import {
