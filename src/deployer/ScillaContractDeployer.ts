@@ -124,7 +124,7 @@ export interface UserDefinedLibrary {
   address: string;
 }
 
-type OptionalUserDefinedLibraryList = UserDefinedLibrary[] | null;
+export type OptionalUserDefinedLibraryList = UserDefinedLibrary[] | null;
 
 export async function deploy(
   hre: HardhatRuntimeEnvironment,
