@@ -1,21 +1,14 @@
 import { BN, Long } from "@zilliqa-js/util";
 import chai, { expect } from "chai";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-
 
 import { scillaChaiEventMatcher } from '../src/ScillaChaiMatchers';
 import { setup } from '../src/ScillaContractDeployer';
-import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
 
 import { useEnvironment } from "./helpers"
 
 chai.use(scillaChaiEventMatcher);
 
 describe("", function () {
-
-  let hre : HardhatRuntimeEnvironment;
-  let zobj : ZilliqaHardhatObject.ZilliqaHardhatObject;
-
   useEnvironment("hardhat-project");
   describe("Contract deployment", function () {
     it("Should be able to override deployment parameters", async function () {

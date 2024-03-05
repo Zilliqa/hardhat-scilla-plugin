@@ -1,16 +1,9 @@
 import { BN } from "@zilliqa-js/util";
 import { expect } from "chai";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-
-import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
 
 import { useEnvironment } from "./helpers"
 
 describe("", function () {
-
-  let hre : HardhatRuntimeEnvironment;
-  let zobj : ZilliqaHardhatObject.ZilliqaHardhatObject;
-
   useEnvironment("hardhat-project");
   this.timeout(500000);
   describe("Zilliqa network APIs", function () {

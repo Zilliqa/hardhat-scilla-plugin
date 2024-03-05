@@ -1,8 +1,6 @@
 import chai, { expect } from "chai";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { scillaChaiEventMatcher } from '../src/ScillaChaiMatchers';
-import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
 
 import { useEnvironment } from "./helpers"
 
@@ -10,14 +8,8 @@ import { useEnvironment } from "./helpers"
 chai.use(scillaChaiEventMatcher);
 
 describe("", function () {
-
-  let hre : HardhatRuntimeEnvironment;
-  let zobj : ZilliqaHardhatObject.ZilliqaHardhatObject;
-
   useEnvironment("hardhat-project");
   describe("Contract connect", function () {
-    let contractAddress : string;
-
     before(async function () {
       const param =  this.zobj.getDefaultAccount()!.address;
       const contract = await this.hre.deployScillaContract("HelloWorld", param);
