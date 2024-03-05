@@ -6,6 +6,7 @@ import {
   OptionalUserDefinedLibraryList,
   ScillaContract,
   UserDefinedLibrary,
+  deploy,
 } from "./ScillaContractDeployer";
 
 export class ContractDeployer {
@@ -68,20 +69,7 @@ export class ContractDeployer {
       this.contractParams.push(this.txParams);
     }
 
-    let contract;
-    if (this.userDefinedLibraries) {
-      contract = await this.hre.deployScillaContractWithLib(
-        this.contractName,
-        this.userDefinedLibraries,
-        ...this.contractParams
-      );
-    } else {
-      contract = await this.hre.deployScillaContract(
-        this.contractName,
-        ...this.contractParams
-      );
-    }
-
+    const contract = deploy(this.hre, this.contractName, this.compress, this.userDefinedLibraries, ...this.contractParams);
     this.reset();
     return contract;
   }

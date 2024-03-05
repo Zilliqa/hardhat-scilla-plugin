@@ -129,6 +129,7 @@ export type OptionalUserDefinedLibraryList = UserDefinedLibrary[] | null;
 export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
+  compressContract: boolean,
   userDefinedLibraries: OptionalUserDefinedLibraryList,
   ...args: any[]
 ): Promise<ScillaContract> {
