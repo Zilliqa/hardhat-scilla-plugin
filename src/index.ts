@@ -3,6 +3,7 @@ import { Init } from "@zilliqa-js/contract";
 import { extendEnvironment } from "hardhat/config";
 import { lazyFunction, lazyObject } from "hardhat/plugins";
 
+import { ContractDeployer } from "./deployer/Deployer";
 import {
   deploy,
   deployFromFile,
@@ -36,6 +37,7 @@ extendEnvironment((hre) => {
   // We use lazyObject to avoid initializing things until they are actually
   // needed.
   hre.scillaContracts = lazyObject(() => loadScillaContractsInfo());
+  hre.contractDeployer = lazyObject(() => new ContractDeployer(hre));
   hre.setScillaDefaults = lazyFunction(() => (params) => {
     return updateSetup(params);
   });

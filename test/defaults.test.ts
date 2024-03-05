@@ -1,8 +1,9 @@
 import { BN, Long } from "@zilliqa-js/util";
 import chai, { expect } from "chai";
 
-import { scillaChaiEventMatcher } from "./chai-matcher/ScillaChaiMatchers";
-import { setup } from "./deployer/ScillaContractDeployer";
+import { scillaChaiEventMatcher } from "../src/chai-matcher/ScillaChaiMatchers";
+import { setup } from "../src/deployer/ScillaContractDeployer";
+
 import { useEnvironment } from "./helpers";
 
 chai.use(scillaChaiEventMatcher);

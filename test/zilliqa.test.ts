@@ -1,8 +1,8 @@
 import { expect } from "chai";
 
+import { initZilliqa } from "../src/deployer/ScillaContractDeployer";
 import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
 
-import { initZilliqa } from "./deployer/ScillaContractDeployer";
 
 describe("", function () {
   let zobj: ZilliqaHardhatObject.ZilliqaHardhatObject;
