@@ -37,7 +37,24 @@ describe("", function () {
         .withContractParams("Hello world!")
         .deploy();
 
+      console.log(contract.isDeployed());
       expect(contract.address).not.null;
+    });
+
+    it("Should be able to deploy a contract with compression", async function () {
+      const contract = await this.hre.contractDeployer
+        .withName("HelloWorld")
+        .withContractParams("sss")
+        .withContractCompression()
+        .deploy();
+
+      console.log(contract.error);
+
+      const tx = await contract.getHello();
+      await expect(tx).to.have.eventLogWithParams("getHello()", {
+        value: "",
+        vname: "msg",
+      });
     });
   });
 });

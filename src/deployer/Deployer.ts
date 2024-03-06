@@ -69,7 +69,7 @@ export class ContractDeployer {
       this.contractParams.push(this.txParams);
     }
 
-    const contract = deploy(
+    const contract = await deploy(
       this.hre,
       this.contractName,
       this.compress,

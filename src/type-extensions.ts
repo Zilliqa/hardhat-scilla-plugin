@@ -33,10 +33,14 @@ declare module "hardhat/types/runtime" {
       userDefinedLibraries: UserDefinedLibrary[],
       ...args: any[]
     ) => Promise<ScillaContract>;
-    deployScillaLibrary: (contractName: string) => Promise<ScillaContract>;
+    deployScillaLibrary: (
+      contractName: string,
+      compress: boolean
+    ) => Promise<ScillaContract>;
     deployScillaFile: (
       contractName: string,
-      init: Init
+      init: Init,
+      compress: boolean
     ) => Promise<[Transaction, ScillaContract]>;
     getZilliqaChainId: () => number;
     getNetworkUrl: () => string;
