@@ -296,6 +296,12 @@ export async function deployFromFile(
 }
 
 export function compressContract(code: string): string {
-  code = code.replace(/\(\*.*?\*\)/gms, "");
-  return code.replace(/(^[ \t]*\n)/gm, "");
+  // Remove comments
+  code = code.replace(/(\(\*.*?\*\))/gms, "");
+
+  // Remove empty lines
+  code = code.replace(/(^[ \t]*\n)/gm, "");
+
+  // Remove extra whitespace at the end of the lines
+  return code.replace(/[ \t]+$/gm, "");
 }
