@@ -4,8 +4,13 @@ import { CallParams, State } from "@zilliqa-js/contract";
 import { BN } from "@zilliqa-js/util";
 import { HardhatPluginError } from "hardhat/plugins";
 
-import * as ScillaContractDeployer from "./ScillaContractDeployer";
-import { ScillaContract, Value, Setup } from "./ScillaContractDeployer";
+import * as ScillaContractDeployer from "../deployer/ScillaContractDeployer";
+import {
+  ScillaContract,
+  Value,
+  Setup,
+} from "../deployer/ScillaContractDeployer";
+
 import { ContractInfo } from "./ScillaContractsInfoUpdater";
 import {
   Field,

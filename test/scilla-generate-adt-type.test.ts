@@ -1,7 +1,7 @@
 import chai, { expect } from "chai";
 import chaiSubset from "chai-subset";
 
-import { ParsedContract, parseScilla } from "../src/ScillaParser";
+import { ParsedContract, parseScilla } from "../src/parser/ScillaParser";
 chai.use(chaiSubset);
 
 describe("Scilla Parser should parse contracts successfully", function () {

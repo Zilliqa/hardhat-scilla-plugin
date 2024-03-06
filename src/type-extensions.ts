@@ -6,16 +6,23 @@ import { Init } from "@zilliqa-js/contract";
 import "hardhat/types/config";
 import "hardhat/types/runtime";
 
-import { ScillaContract, UserDefinedLibrary } from "./ScillaContractDeployer";
-import { ScillaContracts } from "./ScillaContractsInfoUpdater";
+import { ContractDeployer } from "./deployer/Deployer";
+import {
+  ScillaContract,
+  UserDefinedLibrary,
+} from "./deployer/ScillaContractDeployer";
+import { ScillaContracts } from "./parser/ScillaContractsInfoUpdater";
 // Called ZilliqaHardhatObject to distinguish it from @zilliqa-js/zilliqa:Zilliqa
 import { ZilliqaHardhatObject } from "./ZilliqaHardhatObject";
 
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
+    zilliqa: ZilliqaHardhatObject;
     scillaContracts: ScillaContracts;
+    contractDeployer: ContractDeployer;
+
     interactWithScillaContract: (
-      contractAdress: string
+      contractAddress: string
     ) => Promise<ScillaContract | undefined>;
     deployScillaContract: (
       contractName: string,
@@ -26,12 +33,15 @@ declare module "hardhat/types/runtime" {
       userDefinedLibraries: UserDefinedLibrary[],
       ...args: any[]
     ) => Promise<ScillaContract>;
-    deployScillaLibrary: (contractName: string) => Promise<ScillaContract>;
+    deployScillaLibrary: (
+      contractName: string,
+      compress: boolean
+    ) => Promise<ScillaContract>;
     deployScillaFile: (
       contractName: string,
-      init: Init
+      init: Init,
+      compress: boolean
     ) => Promise<[Transaction, ScillaContract]>;
-    zilliqa: ZilliqaHardhatObject;
     getZilliqaChainId: () => number;
     getNetworkUrl: () => string;
     getPrivateKeys: () => string[];

@@ -8,9 +8,9 @@ import fs from "fs";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import * as ScillaContractProxy from "./ScillaContractProxy";
-import { ContractInfo } from "./ScillaContractsInfoUpdater";
-import { Field, Fields, isNumeric } from "./ScillaParser";
+import * as ScillaContractProxy from "../parser/ScillaContractProxy";
+import { ContractInfo } from "../parser/ScillaContractsInfoUpdater";
+import { Field, Fields, isNumeric } from "../parser/ScillaParser";
 
 export interface Value {
   vname: string;
@@ -124,11 +124,12 @@ export interface UserDefinedLibrary {
   address: string;
 }
 
-type OptionalUserDefinedLibraryList = UserDefinedLibrary[] | null;
+export type OptionalUserDefinedLibraryList = UserDefinedLibrary[] | null;
 
 export async function deploy(
   hre: HardhatRuntimeEnvironment,
   contractName: string,
+  compress: boolean,
   userDefinedLibraries: OptionalUserDefinedLibraryList,
   ...args: any[]
 ): Promise<ScillaContract> {
@@ -156,6 +157,7 @@ export async function deploy(
   const [tx, sc] = await deployFromFile(
     contractInfo.path,
     init,
+    compress,
     txParamsForContractDeployment
   );
   sc.deployed_by = tx;
@@ -167,7 +169,8 @@ export async function deploy(
 
 export const deployLibrary = async (
   hre: HardhatRuntimeEnvironment,
-  libraryName: string
+  libraryName: string,
+  compress: boolean
 ): Promise<ScillaContract> => {
   const contractInfo: ContractInfo = hre.scillaContracts[libraryName];
   if (contractInfo === undefined) {
@@ -176,7 +179,7 @@ export const deployLibrary = async (
 
   const init: Init = fillLibraryInit();
 
-  const [tx, sc] = await deployFromFile(contractInfo.path, init, {}); // FIXME: In  #45
+  const [tx, sc] = await deployFromFile(contractInfo.path, init, compress, {}); // FIXME: In  #45
   sc.deployed_by = tx;
 
   return sc;
@@ -261,6 +264,7 @@ const fillInit = (
 export async function deployFromFile(
   path: string,
   init: Init,
+  compress: boolean,
   txParamsForContractDeployment: any
 ): Promise<[Transaction, ScillaContract]> {
   if (setup === null) {
@@ -271,7 +275,10 @@ export async function deployFromFile(
   }
 
   const deployer = setup.zilliqa.wallet.defaultAccount ?? setup.accounts[0];
-  const code = read(path);
+  let code = read(path);
+  if (compress) {
+    code = compressContract(code);
+  }
   const contract = setup.zilliqa.contracts.new(code, init);
   const [tx, sc] = await contract.deploy(
     { ...setup, pubKey: deployer.publicKey, ...txParamsForContractDeployment },
@@ -286,4 +293,15 @@ export async function deployFromFile(
   sc.connect(deployer);
 
   return [tx, sc];
+}
+
+export function compressContract(code: string): string {
+  // Remove comments
+  code = code.replace(/(\(\*.*?\*\))/gms, "");
+
+  // Remove empty lines
+  code = code.replace(/(^[ \t]*\n)/gm, "");
+
+  // Remove extra whitespace at the end of the lines
+  return code.replace(/[ \t]+$/gm, "");
 }

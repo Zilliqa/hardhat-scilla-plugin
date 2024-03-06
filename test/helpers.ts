@@ -2,8 +2,8 @@ import { resetHardhatContext } from "hardhat/plugins-testing";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import path from "path";
 
-import { initZilliqa } from "../src/ScillaContractDeployer";
-import { updateContractsInfo } from "../src/ScillaContractsInfoUpdater";
+import { initZilliqa } from "../src/deployer/ScillaContractDeployer";
+import { updateContractsInfo } from "../src/parser/ScillaContractsInfoUpdater";
 import * as ZilliqaHardhatObject from "../src/ZilliqaHardhatObject";
 
 declare module "mocha" {
@@ -17,7 +17,7 @@ export function useEnvironment(fixtureProjectName: string) {
   before("Loading hardhat environment", async function () {
     process.chdir(path.join(__dirname, "fixture-projects", fixtureProjectName));
     this.hre = require("hardhat");
-    await initZilliqa(
+    initZilliqa(
       process.env.ZILLIQA_API_URL || this.hre.getNetworkUrl(),
       this.hre.getZilliqaChainId(),
       this.hre.getPrivateKeys(),

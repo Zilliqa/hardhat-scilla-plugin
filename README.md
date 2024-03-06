@@ -102,10 +102,29 @@ TxParams {
 let contract: ScillaContract = await hre.deployScillaContract("HelloWorld", "Hello World", {gasLimit: 8000}); // Override a parameter
 ```
 
+Alternatively, you can deploy them using the `contractDeployer` object injected to `hre`:
+```typescript
+  const contract = await hre.contractDeployer
+    .withName("Codehash")
+    .deploy();
+
+  const contract = await this.hre.contractDeployer
+    .withName("HelloWorld")
+    .withContractParams("Hello world!")
+    .deploy();
+ 
+  const contract = await this.hre.contractDeployer
+    .withName("HelloWorld")
+    .withContractParams("sss")
+    .withContractCompression()  // To enable contract compression.
+    .deploy();
+```
+
 In the same way, you can deploy your libraries with their names:
 ```typescript
-let library: ScillaContract = await hre.deployScillaLibrary("MyLibrary");
+let library: ScillaContract = await hre.deployScillaLibrary("MyLibrary", false);
 ```
+Pass `true` as the second parameter if you want your library's contract gets compressed before deployment.
 
 and finally, here is how you can deploy a contract importing a user-defined library:
 ```typescript

@@ -3,7 +3,7 @@ import clc from "cli-color";
 import { glob } from "glob";
 import path from "path";
 
-import * as ZilliqaUtils from "./ZilliqaUtils";
+import * as ZilliqaUtils from "../ZilliqaUtils";
 
 export async function runScillaChecker(contracts: any, libdir: any) {
   let files: string[] = [];

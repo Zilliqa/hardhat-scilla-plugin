@@ -1,0 +1,31 @@
+
+(***************************************************)
+(*             The contract definition             *)
+(***************************************************)
+scilla_version 0 (*version*)
+ 
+contract WithComment (*contract name*)
+()
+(*fields*)
+field welcome_msg : String = "" (*welcome*)
+
+(*first transition*)
+transition setHello (msg : String)
+    is_owner = builtin eq owner _sender;
+    match is_owner with
+    | False =>
+    e = {_eventname : "setHello()"; code : not_owner_code};
+    event e
+    | True =>
+    welcome_msg := msg;
+    e = {_eventname : "setHello()"; code : set_hello_code};
+    event e
+    end
+end
+
+(*second transition*)
+transition getHello ()
+    r <- welcome_msg; (*dummy comment*)
+    e = {_eventname: "getHello()"; msg: r};
+    event e
+end

@@ -3,6 +3,7 @@ import { Init } from "@zilliqa-js/contract";
 import { extendEnvironment } from "hardhat/config";
 import { lazyFunction, lazyObject } from "hardhat/plugins";
 
+import { ContractDeployer } from "./deployer/Deployer";
 import {
   deploy,
   deployFromFile,
@@ -11,9 +12,9 @@ import {
   UserDefinedLibrary,
   updateSetup,
   setAccount,
-} from "./ScillaContractDeployer";
-import { contractFromAddress } from "./ScillaContractInteractor";
-import { loadScillaContractsInfo } from "./ScillaContractsInfoUpdater";
+} from "./deployer/ScillaContractDeployer";
+import { contractFromAddress } from "./deployer/ScillaContractInteractor";
+import { loadScillaContractsInfo } from "./parser/ScillaContractsInfoUpdater";
 import "./task-extensions";
 // This import is needed to let the TypeScript compiler know that it should include your type
 // extensions in your npm package's types file.
@@ -25,17 +26,18 @@ export {
   Setup,
   initZilliqa,
   UserDefinedLibrary,
-} from "./ScillaContractDeployer";
+} from "./deployer/ScillaContractDeployer";
 export { ZilliqaHardhatObject } from "./ZilliqaHardhatObject";
 export { BN } from "@zilliqa-js/util";
 
-export { scillaChaiEventMatcher } from "./ScillaChaiMatchers";
+export { scillaChaiEventMatcher } from "./chai-matcher/ScillaChaiMatchers";
 
 extendEnvironment((hre) => {
   // We add a field to the Hardhat Runtime Environment here.
   // We use lazyObject to avoid initializing things until they are actually
   // needed.
   hre.scillaContracts = lazyObject(() => loadScillaContractsInfo());
+  hre.contractDeployer = lazyObject(() => new ContractDeployer(hre));
   hre.setScillaDefaults = lazyFunction(() => (params) => {
     return updateSetup(params);
   });
@@ -50,7 +52,7 @@ extendEnvironment((hre) => {
   hre.deployScillaContract = lazyFunction(
     () =>
       async (contractName: string, ...args: any[]): Promise<ScillaContract> => {
-        return deploy(hre, contractName, [], ...args);
+        return deploy(hre, contractName, false, [], ...args);
       }
   );
 
@@ -61,14 +63,17 @@ extendEnvironment((hre) => {
         userDefinedLibraries: UserDefinedLibrary[],
         ...args: any[]
       ): Promise<ScillaContract> => {
-        return deploy(hre, contractName, userDefinedLibraries, ...args);
+        return deploy(hre, contractName, false, userDefinedLibraries, ...args);
       }
   );
 
   hre.deployScillaLibrary = lazyFunction(
     () =>
-      async (libraryName: string): Promise<ScillaContract> => {
-        return deployLibrary(hre, libraryName);
+      async (
+        libraryName: string,
+        compress: boolean
+      ): Promise<ScillaContract> => {
+        return deployLibrary(hre, libraryName, compress);
       }
   );
 
@@ -76,9 +81,10 @@ extendEnvironment((hre) => {
     () =>
       async (
         contractPath: string,
-        init: Init
+        init: Init,
+        compress: boolean
       ): Promise<[Transaction, ScillaContract]> => {
-        return deployFromFile(contractPath, init, {});
+        return deployFromFile(contractPath, init, compress, {});
       }
   );
 
