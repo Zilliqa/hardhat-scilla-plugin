@@ -131,6 +131,15 @@ and finally, here is how you can deploy a contract importing a user-defined libr
 contract2 = await hre.deployScillaWithLib("TestContract2",
       [{name: "MutualLib", address: mutualLibAddress}]
 ```
+Or:
+```typescript
+  const contract = await this.hre.contractDeployer
+    .withName("TestContract2")
+    .withUserDefinedLibraries(
+      [{name: "MutualLib", address: mutualLibAddress}]
+    )
+    .deploy();
+```
 
 To change the deployer of the contract, you can send an instance of `Account` class to `hre.setActiveAccount`.
 

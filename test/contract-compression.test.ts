@@ -8,36 +8,36 @@ describe("Contract Compression", function () {
 (*             The contract definition             *)
 (***************************************************)
 contract HelloWorld
-(owner: ByStr20)`
+(owner: ByStr20)`;
     const compressed = compressContract(code);
     expect(compressed).to.be.eq(`contract HelloWorld
-(owner: ByStr20)`)
+(owner: ByStr20)`);
   });
 
   it("#2", async function () {
     const code = `(*something*)contract HelloWorld
-(owner: ByStr20)`
+(owner: ByStr20)`;
     const compressed = compressContract(code);
     expect(compressed).to.be.eq(`contract HelloWorld
-(owner: ByStr20)`)
+(owner: ByStr20)`);
   });
 
   it("#3", async function () {
     const code = `contract HelloWorld (* a dummy comment*)
-(owner: ByStr20)`
+(owner: ByStr20)`;
     const compressed = compressContract(code);
     expect(compressed).to.be.eq(`contract HelloWorld
-(owner: ByStr20)`)
+(owner: ByStr20)`);
   });
 
   it("#4", async function () {
     const code = `contract WithComment          (*contract name*)
 ()
 (*fields*)
-field welcome_msg : String = "" (*welcome*) (*another comment*)  `
+field welcome_msg : String = "" (*welcome*) (*another comment*)  `;
     const compressed = compressContract(code);
     expect(compressed).to.be.eq(`contract WithComment
 ()
-field welcome_msg : String = ""`)
+field welcome_msg : String = ""`);
   });
 });
