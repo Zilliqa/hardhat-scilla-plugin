@@ -139,9 +139,9 @@ export async function deploy(
   }
 
   let txParamsForContractDeployment = {};
-  const constructorParams =
+  const constructorParamsLength =
     contractInfo.parsedContract.constructorParams?.length || 0;
-  if (args.length === constructorParams + 1) {
+  if (args.length === constructorParamsLength + 1) {
     // The last param is Tx info such as amount, nonce, gasPrice
     txParamsForContractDeployment = args.pop();
   }
