@@ -113,6 +113,15 @@ describe("", function () {
         "owner_list"
       );
     });
+ 
+    it("should return `ByStr20` type for `initial_collection_contract` contract deployment parameter", async () => {
+      const cont = parseScilla(
+        "contracts/scilla/EnglishAuction.scilla"
+      );
+      
+      expect(cont.constructorParams![0].type).to.be.eq("ByStr20");
+      expect(cont.constructorParams![1].type).to.be.eq("ByStr20");
+    });
   });
 
   describe("Scilla Parser should parse libraries successfully", function () {
