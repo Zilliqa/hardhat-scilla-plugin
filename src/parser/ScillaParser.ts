@@ -219,7 +219,7 @@ const extractContractFields = (cfieldsElem: any[]): Fields => {
       };
     } else if (fieldTypeData[0] === "Address") {
       return {
-        type: "Address",
+        type: "ByStr20",
         name: fieldNameData[1],
       };
     } else {

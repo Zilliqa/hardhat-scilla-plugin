@@ -1,0 +1,12 @@
+scilla_version 0
+
+contract EnglishAuctionOrderbook
+(
+  initial_contract_owner: ByStr20,
+  initial_collection_contract: ByStr20 with contract
+    field token_collection: Map ByStr20 (Map Uint256 Uint32),
+    field collection_owning_brand: Map Uint32 ByStr20,
+    field has_had_first_sale: Map ByStr20 (Map Uint256 Bool),
+    field collection_commission_fee: Map Uint32 Uint128
+  end
+)
